@@ -1,3 +1,6 @@
 [submodule "MongoYii"]
 	path = classes
 	url = ../MongoYii.git
+[submodule "classes"]
+	path = classes
+	url = ../MongoYii.git
