@@ -6,7 +6,7 @@
  * It can accept an input file from $_FILES via ::populate and can also do find() and findOne() on the files collection.
  * This file is specifically designed for uploading files from a form to GridFS and is merely a helper, IT IS IN NO WAY REQUIRED.
  */
-class EMongoFile extends EMongoDocument
+class MongoFile extends MongoDocument
 {
 	/**
 	 * Our file object, can be either the MongoGridFSFile or CUploadFile

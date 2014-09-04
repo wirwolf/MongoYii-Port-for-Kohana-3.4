@@ -4,7 +4,7 @@
  * EMongoException
  * The exception class that is used by this extension
  */
-class EMongoException extends CException
+class MongoException extends \Exception
 {
 	public $errorInfo;
 	

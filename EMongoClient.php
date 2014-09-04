@@ -10,7 +10,7 @@
  * Normally this would represent the MongoClient or Mongo and it is even named after them and implements
  * some of their functions but it is not due to the way Yii works.
  */
-class EMongoClient extends CApplicationComponent
+class MongoClient extends CApplicationComponent
 {
 	/**
 	 * The server string (connection string pre-1.3)

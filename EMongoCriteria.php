@@ -11,7 +11,7 @@
  * @property int $limit
  * @property array $project
  */
-class EMongoCriteria extends CComponent
+class MongoCriteria extends CComponent
 {
 	/**
 	 * @var array

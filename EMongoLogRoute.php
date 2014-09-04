@@ -6,7 +6,7 @@
 * It is the mongodb equivalent of CDbLogRoute
 */
 
-class EMongoLogRoute extends CLogRoute
+class MongoLogRoute extends CLogRoute
 {
 	/**
 	 * @var string the connectionId of the EMongoClient component

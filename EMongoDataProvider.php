@@ -5,7 +5,7 @@
  *
  * A data Provider helper for interacting with the EMongoCursor
  */
-class EMongoDataProvider extends CActiveDataProvider
+class MongoDataProvider extends CActiveDataProvider
 {
 	/**
 	 * The primary ActiveRecord class name. The {@link getData()} method

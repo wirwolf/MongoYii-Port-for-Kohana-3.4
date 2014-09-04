@@ -5,7 +5,7 @@
  *
  * The active record itself
  */
-class EMongoDocument extends EMongoModel
+class MongoDocument extends EMongoModel
 {
 	/**
 	 * Holds a set of cached models for the active record to instantiate from

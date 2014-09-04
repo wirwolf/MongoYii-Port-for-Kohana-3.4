@@ -1,6 +1,6 @@
 <?php
 
-class EMongoModel extends CModel
+class MongoModel extends Model
 {
 	/**
 	 * @var EMongoClient the default database connection for all active record classes.
