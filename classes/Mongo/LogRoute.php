@@ -25,7 +25,7 @@ class LogRoute/* extends CLogRoute*/
 	 */
 	public function getMongoConnection()
 	{
-		return \Registry::getMongodb()->{$this->connectionId}->{$this->logCollectionName};
+		return \Registry::instance()->MongoDB->{$this->connectionId}->{$this->logCollectionName};
 	}
 
 	/**

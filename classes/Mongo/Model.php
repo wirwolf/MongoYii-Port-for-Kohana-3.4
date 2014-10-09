@@ -604,7 +604,7 @@ class Model extends \Model
 	 */
 	public function getMongoComponent()
 	{
-		return \Registry::getMongodb();
+		return \Registry::instance()->MongoDB;
 	}
 
 	/**

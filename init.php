@@ -9,10 +9,10 @@
 //TODO Move this in config
 $db = new \Mongo\Client();
 $db->server = 'mongodb://localhost:27017';
-$db->db = '';
+$db->db = 'test';
 $db->connect();
-$username = '';
-$password = '';
+$username = 'test';
+$password = 'test';
 
 $salted = "${username}:mongo:${password}";
 $hash = md5($salted);
@@ -27,4 +27,11 @@ $result = $db->command([
 	"nonce"        => $nonce["nonce"],
 	"key"          => $saltedHash
 ]);
-\Registry::setMongodb($db);
+class MongoInRegistry extends Registry
+{
+	public static function setProperty($name, $value)
+	{
+		parent::setProperty($name, $value);
+	}
+}
+MongoInRegistry::setProperty('MongoDB',$db);

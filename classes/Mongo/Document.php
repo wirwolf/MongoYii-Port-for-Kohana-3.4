@@ -1291,7 +1291,7 @@ class Document extends \Mongo\Model
 			$query = CMap::mergeArray($query, $c['condition']);
 		}
 
-		return \Registry::getMongodb()->command([
+		return \Registry::instance()->MongoDB->command([
 			'distinct' => $this->collectionName(),
 			'key' => $key,
 			'query' => $query
