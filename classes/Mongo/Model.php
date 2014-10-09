@@ -5,7 +5,7 @@ namespace Mongo;
 class Model extends \Model
 {
 	/**
-	 * @var EMongoClient the default database connection for all active record classes.
+	 * @var \Mongo\Client the default database connection for all active record classes.
 	 * By default, this is the 'mongodb' application component.
 	 * @see getDbConnection
 	 */
@@ -14,7 +14,7 @@ class Model extends \Model
 	private $_errors = [];	// attribute name => array of errors
 
 	private $_attributes = [];
-	
+
 	private $_related = [];
 
 	private $_partial = false;
@@ -295,7 +295,7 @@ class Model extends \Model
 			$this->$name = null;
 		}
 	}
-	
+
 	/**
 	 * Allows for mass assignment of the record in question
 	 */
@@ -304,14 +304,15 @@ class Model extends \Model
 		if($attributes === false){
 			return null;
 		}
-		
+
+		/** @var Model $record */
 		$record = new $this;
 		$record->setScenario('update');
-		
+
 		foreach($attributes as $name => $value){
 			$record->setAttribute($name, $value);
 		}
-		
+
 		$record->init();
 		$record->attachBehaviors($record->behaviors());
 
@@ -390,13 +391,13 @@ class Model extends \Model
         if($relation[0] === 'one' && is_array($pk) && array_key_exists('$ref', $pk)){
             $pk = [$pk];
         }
-        
+
 		// Form the where clause
 		$where = $params;
 		if(isset($relation['where']) && !$params){
 			$where = array_merge($relation['where'], $params);
 		}
-		
+
 		// Find out what the pk is and what kind of condition I should apply to it
 		if(is_array($pk)){
 			//It is an array of references
@@ -434,7 +435,7 @@ class Model extends \Model
 				->sort(isset($relation['sort']) ? $relation['sort'] : [])
 				->skip(isset($relation['skip']) ? $relation['skip'] : null)
 				->limit(isset($relation['limit']) ? $relation['limit'] : null);
-			
+
 			if(!isset($relation['cache']) || $relation['cache'] === true){
 				return $this->_related[$name] = iterator_to_array($cursor);
 			}
@@ -598,9 +599,11 @@ class Model extends \Model
 		}
 		throw new Exception('MongoDB Active Record requires a "mongodb" \Mongo\Client application component.');
 	}
-	
+
+
 	/**
 	 * This allows you to define a custom override by default for models and the such
+	 * @return Client|null
 	 */
 	public function getMongoComponent()
 	{
