@@ -9,10 +9,10 @@
 //TODO Move this in config
 $db = new \Mongo\Client();
 $db->server = 'mongodb://localhost:27017';
-$db->db = 'test';
+$db->db = 'OGame';
 $db->connect();
-$username = 'test';
-$password = 'test';
+$username = 'ogame';
+$password = 'ogame';
 
 $salted = "${username}:mongo:${password}";
 $hash = md5($salted);
