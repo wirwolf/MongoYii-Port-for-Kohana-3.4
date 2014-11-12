@@ -4,7 +4,7 @@ namespace Mongo;
  * \Mongo\Exception
  * The exception class that is used by this extension
  */
-class Exception extends \Exception
+class Exception extends \Kohana\Exception
 {
 	public $errorInfo;
 	
