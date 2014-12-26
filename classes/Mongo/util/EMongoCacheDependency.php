@@ -62,13 +62,13 @@ class EMongoCacheDependency extends CCacheDependency
 			}
 			return $result;
 		}else{
-			throw new \Mongo\Exception(Yii::t('yii','EMongoCacheDependency.query cannot be empty.'));
+			throw new EMongoException(Yii::t('yii','EMongoCacheDependency.query cannot be empty.'));
 		}
 	}
 	
 	protected function createCursor()
 	{
-		$query = [];
+		$query = array();
 		if(isset($this->query[0])){
 			$query = $this->query[0];
 		}
@@ -102,11 +102,11 @@ class EMongoCacheDependency extends CCacheDependency
 			if(($this->_db=Yii::app()->getComponent($this->connectionID)) instanceof EMongoClient){
 				return $this->_db;
 			}else{
-				throw new \Mongo\Exception(
+				throw new EMongoException(
 					Yii::t(
 						'yii', 
 						'EMongoCacheDependency.connectionID "{id}" is invalid. Please make sure it refers to the ID of a EMongoClient application component.',
-						['{id}' => $this->connectionID]
+						array('{id}' => $this->connectionID)
 					)
 				);
 			}
