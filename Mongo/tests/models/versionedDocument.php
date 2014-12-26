@@ -10,10 +10,11 @@ class versionedDocument extends EMongoDocument
 	public function collectionName()
 	{
 		return 'versioned';
-	}	
-	
+	}
+
 	/**
 	 * Returns the static model of the specified AR class.
+	 * @param string $className
 	 * @return User the static model class
 	 */
 	public static function model($className = __CLASS__)

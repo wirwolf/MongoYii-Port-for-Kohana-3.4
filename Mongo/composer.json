@@ -15,15 +15,15 @@
     		"./behaviors",
     		"./util",
     		"./validators",
-    		"./EMongoClient.php",
-    		"./EMongoCriteria.php",
-    		"./EMongoCursor.php",
-    		"./EMongoDataProvider.php",
-    		"./EMongoDocument.php",
-    		"./EMongoFile.php",
-    		"./EMongoLogRoute.php",
-    		"./EMongoModel.php",
-    		"./EMongoSort.php"
+    		"./\Mongo\Client.php",
+    		"./\Mongo\Criteria.php",
+    		"./\Mongo\Cursor.php",
+    		"./\Mongo\DataProvider.php",
+    		"./\Mongo\Document.php",
+    		"./\Mongo\File.php",
+    		"./\Mongo\LogRoute.php",
+    		"./\Mongo\Model.php",
+    		"./\Mongo\Sort.php"
     	]
     }
 }

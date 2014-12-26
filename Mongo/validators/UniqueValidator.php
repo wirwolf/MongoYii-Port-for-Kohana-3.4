@@ -1,5 +1,5 @@
 <?php
-
+namespace Mongo\validators;
 /**
  * EMongoUniqueValidator validates that the attribute value is unique in the corresponding database table.
  *
@@ -48,7 +48,7 @@ class EMongoUniqueValidator extends CValidator
 	 * value exists in the corresponding table column.
 	 * This array will be used to instantiate a {@link CDbCriteria} object.
 	 */
-	public $criteria = array();
+	public $criteria = [];
 	
 	/**
 	 * @var string the user-defined error message. The placeholders "{attribute}" and "{value}"
@@ -84,7 +84,7 @@ class EMongoUniqueValidator extends CValidator
 			->findOne(
 				array_merge(
 					$this->criteria, 
-					array($attributeName => $this->caseSensitive ? $value : new MongoRegex('/' . $value . '/i'))
+					[$attributeName => $this->caseSensitive ? $value : new MongoRegex('/' . $value . '/i')]
 				)
 			);
 
@@ -92,7 +92,7 @@ class EMongoUniqueValidator extends CValidator
 		if($doc && (string)$doc[$object->primaryKey()] != (string)$object->getPrimaryKey()){
 			// Then it ain't unique
 			$message = $this->message !== null ? $this->message : Yii::t('yii', '{attribute} "{value}" has already been taken.');
-			$this->addError($object, $attribute, $message, array('{value}' => CHtml::encode($value)));
+			$this->addError($object, $attribute, $message, ['{value}' => CHtml::encode($value)]);
 		}else{}
 	}
 }

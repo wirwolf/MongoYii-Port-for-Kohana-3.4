@@ -1,5 +1,5 @@
 <?php
-
+namespace Mongo\util;
 /**
  * EMongoPagination
  * @author Kim BeeJay <kim@beejay.ru>

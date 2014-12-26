@@ -79,7 +79,7 @@ class MongoClientTest extends CTestCase
 
 	public function testArrayMerging()
 	{
-		$a = CMap::mergeArray(array('a' => 1, 'b' => array('c' => 2)), array('a' => 1, 'b' => array('c' => 2, 'd' => 3)));
+		$a = CMap::mergeArray(['a' => 1, 'b' => ['c' => 2]], ['a' => 1, 'b' => ['c' => 2, 'd' => 3]]);
 		$this->assertTrue(isset($a['a'], $a['b'], $a['b']['c'], $a['b']['d']));
 	}
 }

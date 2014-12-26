@@ -1,4 +1,5 @@
 <?php
+namespace Mongo\util;
 /**
  * Extends the Yii class 'CCache' to store cached data in mongoDB.
  *
@@ -61,7 +62,7 @@ class EMongoCache extends CCache
 		parent::init();
 
 		if($this->ensureIndex){
-			$this->getCollection()->ensureIndex( array('key' => 1));  // create index on "key"
+			$this->getCollection()->ensureIndex( ['key' => 1]);  // create index on "key"
 		}
 	}
 	 
@@ -81,7 +82,7 @@ class EMongoCache extends CCache
 					Yii::t(
 						'yii', 
 						'EMongoCache.connectionID "{id}" is invalid. Please make sure it refers to the ID of a EMongoClient application component.',
-						array('{id}'=>$id)
+						['{id}'=>$id]
 					)
 				);
 			}
@@ -139,13 +140,13 @@ class EMongoCache extends CCache
 	{
 		$time = time();
 
-		$criteria = array(
+		$criteria = [
 			'key' => (string)$key,
-			'$or' =>  array(
-				array('expire' => 0),
-				array('expire' => array('$gt'=> $time)),
-			),
-		);
+			'$or' =>  [
+				['expire' => 0],
+				['expire' => ['$gt'=> $time]],
+			],
+		];
 
 		$data = $this->getCollection()->findOne($criteria);
 
@@ -160,19 +161,19 @@ class EMongoCache extends CCache
 	protected function getValues($keys)
 	{
 		if(empty($keys)){
-			return array();
+			return [];
 		}
 
-		$results = array();
+		$results = [];
 		$time = time();
 
-		$criteria = array(
-			'key' => array('$in' => $keys),
-			'$or' => array(
-				array('expire' => 0),
-				array('expire' => array('$gt'=> $time)),
-			),
-		);
+		$criteria = [
+			'key' => ['$in' => $keys],
+			'$or' => [
+				['expire' => 0],
+				['expire' => ['$gt'=> $time]],
+			],
+		];
 
 		$data = $this->getCollection()->find($criteria);
 
@@ -223,15 +224,15 @@ class EMongoCache extends CCache
 			$expire = 0;
 		}
 
-		$criteria = array('key' => (string)$key);
+		$criteria = ['key' => (string)$key];
 
-		$data = array(
+		$data = [
 			'key' => (string)$key,
 			'value' => (string)$value,
 			'expire' => (int)$expire,
-		);
+		];
 
-		$options = array('upsert' => true);
+		$options = ['upsert' => true];
 
 		try{
 			return $this->getCollection()->update($criteria, $data, $options);
@@ -248,7 +249,7 @@ class EMongoCache extends CCache
 	 */
 	protected function deleteValue($key)
 	{
-		$criteria = array('key' => (string)$key);
+		$criteria = ['key' => (string)$key];
 		$data = $this->getCollection()->remove($criteria);
 		return true;
 	}
@@ -259,10 +260,10 @@ class EMongoCache extends CCache
 	protected function gc()
 	{
 		//delete expired entries
-		$criteria = array(
-			'expired' => array('$gt' => 0),
-			'expired' => array('$lt' => time()),
-		);
+		$criteria = [
+			'expired' => ['$gt' => 0],
+			'expired' => ['$lt' => time()],
+		];
 
 		$this->getCollection()->remove($criteria);
 	}

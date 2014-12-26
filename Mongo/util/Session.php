@@ -1,5 +1,5 @@
 <?php
-
+namespace Mongo\util;
 /**
  * EMongoSession extends {@link CHttpSession} by using database as session data storage.
  *
@@ -54,20 +54,20 @@ class EMongoSession extends CHttpSession
 		$newID = session_id();
 		$db = $this->getDbConnection();
 
-		$row = $db->{$this->sessionTableName}->findOne(array('id' => $oldID));
+		$row = $db->{$this->sessionTableName}->findOne(['id' => $oldID]);
 		if($row){ // $row should either be a truey value or a falsey value
 			if($deleteOldSession){
-				$db->{$this->sessionTableName}->update(array('id' => $oldID), array('$set' => array('id' => $newID)));
+				$db->{$this->sessionTableName}->update(['id' => $oldID], ['$set' => ['id' => $newID]]);
 			}else{
 				$row['id'] = $newID;
 				$db->{$this->sessionTableName}->insert($row);
 			}
 		}else{
 			// shouldn't reach here normally
-			$db->{$this->sessionTableName}->insert(array(
+			$db->{$this->sessionTableName}->insert([
 				'id' => $newID,
 				'expire' => time() + $this->getTimeout()
-			));
+			]);
 		}
 	}
 
@@ -87,7 +87,7 @@ class EMongoSession extends CHttpSession
 					Yii::t(
 						'yii', 
 						'EMongoSession.connectionID "{id}" is invalid. Please make sure it refers to the ID of a EMongoClient application component.',
-						array('{id}' => $id)
+						['{id}' => $id]
 					)
 				);
 			}
@@ -116,10 +116,10 @@ class EMongoSession extends CHttpSession
 	 */
 	public function readSession($id)
 	{
-		$data = $this->getDbConnection()->{$this->sessionTableName}->findOne(array(
-			'expire' => array('$gt' => time()),
+		$data = $this->getDbConnection()->{$this->sessionTableName}->findOne([
+			'expire' => ['$gt' => time()],
 			'id' => $id
-		));
+		]);
 		return $data === null ? '' : $data['data'];
 	}
 
@@ -137,10 +137,12 @@ class EMongoSession extends CHttpSession
 		try{
 			$expire = time() + $this->getTimeout();
 			$db = $this->getDbConnection();
-			$res = $db->{$this->sessionTableName}->update(array('id' => $id), array('$set' => array(
+			$res = $db->{$this->sessionTableName}->update(['id' => $id], [
+				'$set' => [
 				'data' => $data,
 				'expire' => $expire
-			)), array('upsert' => true));
+				]
+			], ['upsert' => true]);
 			return ((isset($res['upserted']) && $res['upserted']) || (isset($res['updatedExisting']) && $res['updatedExisting']));
 		}catch(Exception $e){
 			if(YII_DEBUG){
@@ -160,7 +162,7 @@ class EMongoSession extends CHttpSession
 	 */
 	public function destroySession($id)
 	{
-		$this->getDbConnection()->{$this->sessionTableName}->remove(array('id' => $id));
+		$this->getDbConnection()->{$this->sessionTableName}->remove(['id' => $id]);
 		return true;
 	}
 
@@ -172,7 +174,7 @@ class EMongoSession extends CHttpSession
 	 */
 	public function gcSession($maxLifetime)
 	{
-		$this->getDbConnection()->{$this->sessionTableName}->remove(array('expire' => array('$lt' => time())));
+		$this->getDbConnection()->{$this->sessionTableName}->remove(['expire' => ['$lt' => time()]]);
 		return true;
 	}
 }

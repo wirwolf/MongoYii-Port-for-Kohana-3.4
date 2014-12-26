@@ -22,12 +22,12 @@ class MongoActiveDataProviderTest extends CTestCase
 			$u->save();
 		}
 
-		$d = new EMongoDataProvider('User', array(
-			'criteria' => array(
-				'condition' => array('username' => 'sammaye'),
-				'sort' => array('username' => -1),
-			)
-		));
+		$d = new EMongoDataProvider('User', [
+			'criteria' => [
+				'condition' => ['username' => 'sammaye'],
+				'sort' => ['username' => -1],
+			]
+		]);
 
 		$this->assertTrue($d->getTotalItemCount() == 5);
 		$data = $d->fetchData();

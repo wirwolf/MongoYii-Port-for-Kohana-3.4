@@ -37,7 +37,7 @@ class MongoCursorTest extends CTestCase
 			$u->save();
 		}
 
-		$c = new EMongoCursor('User', array('username' => 'sammaye'));
+		$c = new EMongoCursor('User', ['username' => 'sammaye']);
 
 		$this->assertInstanceOf('EMongoCursor', $c);
 		$this->assertTrue($c->count() > 0);
@@ -54,7 +54,7 @@ class MongoCursorTest extends CTestCase
 			$u->save();
 		}
 
-		$criteria = new EMongoCriteria(array('condition' => array('username' => 'sammaye'), 'limit' => 3, 'skip' => 1));
+		$criteria = new EMongoCriteria(['condition' => ['username' => 'sammaye'], 'limit' => 3, 'skip' => 1]);
 		$c = new EMongoCursor('User', $criteria);
 		$this->assertInstanceOf('EMongoCursor', $c);
 		$this->assertTrue($c->count() > 0);

@@ -1,5 +1,5 @@
 <?php
-
+namespace Mongo\validators;
 /**
  * EExistValidator validates that the attribute value exists in a table.
  *
@@ -47,7 +47,7 @@ class EMongoExistValidator extends CValidator
 	 * value exists in the corresponding table column.
 	 * This array will be used to instantiate a {@link CDbCriteria} object.
 	 */
-	public $criteria = array();
+	public $criteria = [];
 	
 	/**
 	 * @var boolean whether the attribute value can be null or empty. Defaults to true,
@@ -74,10 +74,10 @@ class EMongoExistValidator extends CValidator
 		$attributeName = $this->attributeName === null ? $attribute : $this->attributeName;
 		$finder = EMongoDocument::model($className);
 
-		$criteria = array($attributeName => $this->mongoId ? new MongoId($value) : $value);
+		$criteria = [$attributeName => $this->mongoId ? new MongoId($value) : $value];
 		if(!$finder->exists($criteria)){
 			$message = $this->message !== null ? $this->message : Yii::t('yii', '{attribute} "{value}" is invalid.');
-			$this->addError($object, $attribute, $message, array('{value}' => CHtml::encode($value)));
+			$this->addError($object, $attribute, $message, ['{value}' => CHtml::encode($value)]);
 		}
 	}
 }

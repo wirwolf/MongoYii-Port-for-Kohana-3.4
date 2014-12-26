@@ -93,10 +93,10 @@ class MongoAuthManagerTest extends CTestCase
 		
 		// Update ACL collection to add user to editor group
 		$tree = Yii::app()->mongodb->{$auth->collectionName}->findOne();
-		$tree['editor']['assignments']['readerA'] = array(
+		$tree['editor']['assignments']['readerA'] = [
 			'bizRule' => null,
-			'data' => null 
-		); // add assignment
+			'data' => null
+		]; // add assignment
 		Yii::app()->mongodb->{$auth->collectionName}->save($tree);
 		
 		// re-load ACL tree and check access

@@ -1,5 +1,5 @@
 <?php
-
+namespace Mongo\validators;
 /**
  * EMongoIdValidator
  *

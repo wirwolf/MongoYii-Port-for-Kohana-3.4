@@ -1,5 +1,5 @@
 <?php
-
+namespace Mongo\util;
 /**
  * EMongoAuthManager
  *
@@ -40,10 +40,10 @@ class EMongoAuthManager extends CPhpAuthManager
 	 * @var string the MongoId of the current auth record
 	 */
 	private $_id;
-	
+
 	/**
 	 * Get a MongoCollection object
-	 * 
+	 * @param null $collection
 	 * @return Instance of MongoCollection
 	 */
 	public function getMongoConnection($collection = null)
@@ -74,7 +74,7 @@ class EMongoAuthManager extends CPhpAuthManager
 		$mongoCollection = $this->getMongoConnection($collection);
 		$data = $mongoCollection->findOne();
 		if($data === null){
-			return array();
+			return [];
 		}
 		
 		$this->_id = $data['_id'];

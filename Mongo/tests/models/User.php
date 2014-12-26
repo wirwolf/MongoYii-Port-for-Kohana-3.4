@@ -7,11 +7,11 @@ class User extends EMongoDocument
 	
 	public $username;
 	
-	public $addresses = array();
+	public $addresses = [];
 	
 	public $url = null;
 	
-	public $interests = array();
+	public $interests = [];
 	
 	public $mainSkill;
 
@@ -19,35 +19,37 @@ class User extends EMongoDocument
 
 	public function scopes()
 	{
-		return array(
-			'programmers' => array(
-				'condition' => array('job_title' => 'programmer'),
-				'sort' => array('name' => 1),
+		return [
+			'programmers' => [
+				'condition' => ['job_title' => 'programmer'],
+				'sort' => ['name' => 1],
 				'skip' => 1,
 				'limit' => 3
-			)
-		);
+			]
+		];
 	}
 
 	public function behaviors()
 	{
-		return array(
+		return [
 			'EMongoTimestampBehaviour'
-		);
+		];
 	}
 
 	public function rules()
 	{
-		return array(
-			array('username', 'EMongoUniqueValidator', 'className' => 'User', 'attributeName' => 'username', 'on' => 'testUnqiue'),
-			array('addresses', 'subdocument', 'type' => 'many', 'rules' => array(
-				array('road, town, county, post_code', 'safe'),
-				array('telephone', 'numerical', 'integerOnly' => true)
-			)),
-			array('mainSkill, otherSkills', 'safe'),
-			array('url', 'subdocument', 'type' => 'one', 'class' => 'SocialUrl'),
-			array('_id, username, addresses', 'safe', 'on'=>'search'),
-		);
+		return [
+			['username', 'EMongoUniqueValidator', 'className' => 'User', 'attributeName' => 'username', 'on' => 'testUnqiue'],
+			[
+				'addresses', 'subdocument', 'type' => 'many', 'rules' => [
+				['road, town, county, post_code', 'safe'],
+				['telephone', 'numerical', 'integerOnly' => true]
+			]
+			],
+			['mainSkill, otherSkills', 'safe'],
+			['url', 'subdocument', 'type' => 'one', 'class' => 'SocialUrl'],
+			['_id, username, addresses', 'safe', 'on'=>'search'],
+		];
 	}
 
 	public function collectionName()
@@ -57,25 +59,26 @@ class User extends EMongoDocument
 
 	public function relations()
 	{
-		return array(
-			'many_interests' => array('many', 'Interest', 'i_id'),
-			'one_interest' => array('one', 'Interest', 'i_id'),
-			'embedInterest' => array('many', 'Interest', '_id', 'on' => 'interests'),
-			'where_interest' => array('many', 'Interest', 'i_id', 'where' => array('name' => 'jogging'), 'cache' => false),
-			'primarySkill' => array('one', 'Skill', '_id', 'on' => 'mainSkill'),
-			'secondarySkills' => array('many', 'Skill', '_id', 'on' => 'otherSkills'),
-		);
+		return [
+			'many_interests' => ['many', 'Interest', 'i_id'],
+			'one_interest' => ['one', 'Interest', 'i_id'],
+			'embedInterest' => ['many', 'Interest', '_id', 'on' => 'interests'],
+			'where_interest' => ['many', 'Interest', 'i_id', 'where' => ['name' => 'jogging'], 'cache' => false],
+			'primarySkill' => ['one', 'Skill', '_id', 'on' => 'mainSkill'],
+			'secondarySkills' => ['many', 'Skill', '_id', 'on' => 'otherSkills'],
+		];
 	}
 
 	public function attributeLabels()
 	{
-		return array(
+		return [
 			'username' => 'name'
-		);
+		];
 	}
 
 	/**
 	 * Returns the static model of the specified AR class.
+	 * @param string $className
 	 * @return User the static model class
 	 */
 	public static function model($className = __CLASS__)
@@ -88,8 +91,8 @@ class SocialUrl extends EMongoModel
 {
 	public function rules()
 	{
-		return array(
-			array('url, caption', 'numerical', 'integerOnly' => true),
-		);
+		return [
+			['url, caption', 'numerical', 'integerOnly' => true],
+		];
 	}
 }

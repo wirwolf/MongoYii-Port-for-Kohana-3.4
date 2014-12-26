@@ -15,19 +15,19 @@ class Skill extends EMongoDocument
 	
 	public function rules()
 	{
-		return array (
-			array('_id, name', 'safe', 'on' => 'search')
-		);
+		return [
+			['_id, name', 'safe', 'on' => 'search']
+		];
 	}
 	
 	public function collectionName()
 	{
 		return 'skills';
 	}
-	
+
 	/**
 	 * Returns the static model of the specified AR class.
-	 * 
+	 * @param string $className
 	 * @return User the static model class
 	 */
 	public static function model($className = __CLASS__)

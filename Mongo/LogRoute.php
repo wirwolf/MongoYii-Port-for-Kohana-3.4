@@ -1,15 +1,15 @@
 <?php
-
+namespace Mongo;
 /**
-* EMongoLogRoute extends CLogRoute and provides logging
+* \Mongo\LogRoute extends CLogRoute and provides logging
 * into MongoDB.
 * It is the mongodb equivalent of CDbLogRoute
 */
 
-class EMongoLogRoute extends CLogRoute
+class LogRoute extends CLogRoute
 {
 	/**
-	 * @var string the connectionId of the EMongoClient component
+	 * @var string the connectionId of the \Mongo\Client component
 	 */
 	public $connectionId = 'mongodb';
 
@@ -37,12 +37,12 @@ class EMongoLogRoute extends CLogRoute
 		$collection = $this->getMongoConnection();
 		foreach($logs as $log){
 			$collection->insert(
-				array(
+				[
 					'level' => $log[1],
 					'category' => $log[2],
 					'logtime' => (int)$log[3],
 					'message' => $log[0],
-				)
+				]
 			);
 		}
 	}

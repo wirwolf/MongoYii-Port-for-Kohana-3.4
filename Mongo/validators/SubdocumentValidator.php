@@ -1,5 +1,5 @@
 <?php
-
+namespace Mongo\validators;
 /**
  * ESubdocumentValidator
  *
@@ -43,7 +43,7 @@ class ESubdocumentValidator extends CValidator
 						Yii::t(
 							'yii', 
 							'{class} has an invalid validation rule. The rule must specify attributes to be validated and the validator name.',
-							array('{class}' => get_class($this))
+							['{class}' => get_class($this)]
 						)
 					);
 				}
@@ -59,9 +59,9 @@ class ESubdocumentValidator extends CValidator
 		if($this->type == 'many'){
 			if(is_array($object->$attribute)){
 
-				$fieldErrors = array();
-				$fieldValue = array();
-				$newFieldValue = array();
+				$fieldErrors = [];
+				$fieldValue = [];
+				$newFieldValue = [];
 
 				foreach($object->$attribute as $index => $row){
 					$c->clean();

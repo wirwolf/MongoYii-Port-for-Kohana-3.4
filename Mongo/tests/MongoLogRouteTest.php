@@ -22,20 +22,20 @@ class MongoLogRouteTest extends CTestCase
 	public function testInsertIntoLog()
 	{
 		$router = new EMongoLogRoute();
-		$logs = array(
-			array('message1', 'level1', 'category1', microtime(true)),
-			array('message2', 'level2', 'category2', microtime(true)),
-			array('message3', 'level3', 'category3', microtime(true)),
-		);
+		$logs = [
+			['message1', 'level1', 'category1', microtime(true)],
+			['message2', 'level2', 'category2', microtime(true)],
+			['message3', 'level3', 'category3', microtime(true)],
+		];
 
 		$router->processLogs($logs);
 		$collection = $router->getMongoConnection();
 
 		foreach ($logs as $log) {
-			$this->assertNull($collection->findOne(array('message' => 'IAmNotThere')));
-			$this->assertArrayHasKey('message', $collection->findOne(array('message' => $log[0])));
-			$this->assertArrayHasKey('level', $collection->findOne(array('level' => $log[1])));
-			$this->assertArrayHasKey('category', $collection->findOne(array('category' => $log[2])));
+			$this->assertNull($collection->findOne(['message' => 'IAmNotThere']));
+			$this->assertArrayHasKey('message', $collection->findOne(['message' => $log[0]]));
+			$this->assertArrayHasKey('level', $collection->findOne(['level' => $log[1]]));
+			$this->assertArrayHasKey('category', $collection->findOne(['category' => $log[2]]));
 		}
 	}
 

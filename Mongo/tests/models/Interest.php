@@ -6,9 +6,9 @@ class Interest extends EMongoDocument
 
 	public function rules()
 	{
-		return array(
-			array('_id, otherId, username', 'safe', 'on' => 'search'),
-		);
+		return [
+			['_id, otherId, username', 'safe', 'on' => 'search'],
+		];
 	}
 
 	public function collectionName()
@@ -18,6 +18,7 @@ class Interest extends EMongoDocument
 
 	/**
 	 * Returns the static model of the specified AR class.
+	 * @param string $className
 	 * @return User the static model class
 	 */
 	public static function model($className = __CLASS__)

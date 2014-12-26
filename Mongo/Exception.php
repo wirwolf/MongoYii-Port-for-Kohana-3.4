@@ -1,10 +1,10 @@
 <?php
-
+namespace Mongo;
 /**
- * EMongoException
+ * \Mongo\Exception
  * The exception class that is used by this extension
  */
-class EMongoException extends CException
+class Exception extends \Exception
 {
 	public $errorInfo;
 	

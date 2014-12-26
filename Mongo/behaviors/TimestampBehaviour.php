@@ -56,12 +56,12 @@ class EMongoTimestampBehaviour extends CActiveRecordBehavior
 	/**
 	 * @var array set attributes only on this scenarios
 	 */
-	public $onScenario = array();
+	public $onScenario = [];
 
 	/**
 	 * @var array not set attributes only on this scenarios
 	*/
-	public $notOnScenario = array();
+	public $notOnScenario = [];
 
 	/**
 	 * @var bool Whether to set the update attribute to the creation timestamp upon creation.

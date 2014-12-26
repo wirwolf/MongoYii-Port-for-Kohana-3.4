@@ -1,6 +1,7 @@
 <?php
+namespace Mongo;
 /**
- * EMongoClient
+ * \Mongo\Client
  *
  * The MongoDB and MongoClient class combined.
  *
@@ -10,7 +11,7 @@
  * Normally this would represent the MongoClient or Mongo and it is even named after them and implements
  * some of their functions but it is not due to the way Yii works.
  */
-class EMongoClient extends CApplicationComponent
+class Client/* extends CApplicationComponent*/
 {
 	/**
 	 * The server string (connection string pre-1.3)
@@ -22,7 +23,7 @@ class EMongoClient extends CApplicationComponent
 	 * Additional options for the connection constructor
 	 * @var array
 	 */
-	public $options = array();
+	public $options = [];
 	
 	/**
 	 * The name of the database
@@ -55,7 +56,7 @@ class EMongoClient extends CApplicationComponent
 	 * @see http://php.net/manual/en/mongo.readpreferences.php
 	 * @var array()
 	 */
-	public $RP = array('RP_PRIMARY', array());
+	public $RP = ['RP_PRIMARY', []];
 	
 	/**
 	 * The Legacy read preference.
@@ -117,13 +118,13 @@ class EMongoClient extends CApplicationComponent
 	
 	/**
 	 * The Mongo Connection instance
-	 * @var Mongo MongoClient
+	 * @var \Mongo MongoClient
 	 */
 	private $_mongo;
 	
 	/**
 	 * The database instance
-	 * @var MongoDB
+	 * @var \MongoDB
 	 */
 	private $_db;
 	
@@ -132,12 +133,14 @@ class EMongoClient extends CApplicationComponent
 	 * to keep getting them
 	 * @var array
 	 */
-	private $_meta = array();
-	
+	private $_meta = [];
+
 	/**
 	 * The default action is to find a getX whereby X is the $k param
 	 * you input.
 	 * The secondary function, if not getter found, is to get a collection
+	 * @param $k
+	 * @return \MongoCollection
 	 */
 	public function __get($k)
 	{
@@ -154,12 +157,12 @@ class EMongoClient extends CApplicationComponent
 	 * @param array $parameters
 	 * @return mixed
 	 */
-	public function __call($name, $parameters = array())
+	public function __call($name, $parameters = [])
 	{
 		if(!method_exists($this->getDB(), $name)){
 			return parent::__call($name, $parameters);
 		}
-		return call_user_func_array(array($this->getDB(), $name), $parameters);
+		return call_user_func_array([$this->getDB(), $name], $parameters);
 	}
 	
 	public function __construct()
@@ -192,12 +195,7 @@ class EMongoClient extends CApplicationComponent
 	public function connect()
 	{
 		if(!extension_loaded('mongo')){
-			throw new EMongoException(
-				yii::t(
-					'yii', 
-					'We could not find the MongoDB extension ( http://php.net/manual/en/mongo.installation.php ), please install it'
-				)
-			);
+			throw new \Mongo\Exception('We could not find the MongoDB extension ( http://php.net/manual/en/mongo.installation.php ), please install it')ж
 		}
 		
 		// We don't need to throw useless exceptions here, the MongoDB PHP Driver has its own checks and error reporting
@@ -287,7 +285,7 @@ class EMongoClient extends CApplicationComponent
 	public function aggregate($collection, $pipelines)
 	{
 		if(version_compare(phpversion('mongo'), '1.3.0', '<')){
-			return $this->getDB()->command(array('aggregate' => $collection, 'pipeline' => $pipelines));
+			return $this->getDB()->command(['aggregate' => $collection, 'pipeline' => $pipelines]);
 		}
 		return $this->getDB()->$collection->aggregate($pipelines);
 	}
@@ -297,7 +295,7 @@ class EMongoClient extends CApplicationComponent
 	 * @param array|string $command
 	 * @return array
 	 */
-	public function command($command = array())
+	public function command($command = [])
 	{
 		return $this->getDB()->command($command);
 	}
@@ -313,19 +311,19 @@ class EMongoClient extends CApplicationComponent
 	}
 	
 	/**
-	 * Sets the document cache for any particular document (EMongoDocument/EMongoModel)
+	 * Sets the document cache for any particular document (\Mongo\Document/\Mongo\Model)
 	 * sent in as the first parameter of this function.
-	 * Will not cache actual EMongoDocument/EMongoModel instances
+	 * Will not cache actual \Mongo\Document/\Mongo\Model instances
 	 * only active classes that inherit these
 	 * @param $o
 	 */
 	public function setDocumentCache($o)
 	{
 		if(
-			$this->getDocumentCache(get_class($o)) === array() && // Run reflection and cache it if not already there
-			(get_class($o) != 'EMongoDocument' && get_class($o) != 'EMongoModel') /* We can't cache the model */
+			$this->getDocumentCache(get_class($o)) === [] && // Run reflection and cache it if not already there
+			(get_class($o) != '\Mongo\Document' && get_class($o) != '\Mongo\Model') /* We can't cache the model */
 		){
-			$_meta = array();
+			$_meta = [];
 			
 			$reflect = new ReflectionClass(get_class($o));
 			$class_vars = $reflect->getProperties(ReflectionProperty::IS_PUBLIC); // Pre-defined doc attributes
@@ -337,10 +335,10 @@ class EMongoClient extends CApplicationComponent
 				}
 				
 				$docBlock = $prop->getDocComment();
-				$field_meta = array(
+				$field_meta = [
 					'name' => $prop->getName(),
-					'virtual' => $prop->isProtected() || preg_match('/@virtual/i', $docBlock) <= 0 ? false : true 
-				);
+					'virtual' => $prop->isProtected() || preg_match('/@virtual/i', $docBlock) <= 0 ? false : true
+				];
 				
 				// Lets fetch the data type for this field
 				// Since we always fetch the data type for this field we make a regex that will only pick out the first
@@ -361,8 +359,8 @@ class EMongoClient extends CApplicationComponent
 	 */
 	public function getFieldCache($name, $include_virtual = false)
 	{
-		$doc = isset($this->_meta[$name]) ? $this->_meta[$name] : array();
-		$fields = array();
+		$doc = isset($this->_meta[$name]) ? $this->_meta[$name] : [];
+		$fields = [];
 		
 		foreach($doc as $name => $opts){
 			if($include_virtual || !$opts['virtual']){
@@ -379,7 +377,7 @@ class EMongoClient extends CApplicationComponent
 	 */
 	public function getDocumentCache($name)
 	{
-		return isset($this->_meta[$name]) ? $this->_meta[$name] : array();
+		return isset($this->_meta[$name]) ? $this->_meta[$name] : [];
 	}
 	
 	/**
@@ -389,13 +387,13 @@ class EMongoClient extends CApplicationComponent
 	public function getDefaultWriteConcern()
 	{
 		if(!version_compare(phpversion('mongo'), '1.3.0', '<')){
-			return array('w' => $this->w, 'j' => $this->j);
+			return ['w' => $this->w, 'j' => $this->j];
 		}elseif($this->w == 1){
-			return array('safe' => true);
+			return ['safe' => true];
 		}elseif($this->w > 0){
-			return array('safe' => $this->w);
+			return ['safe' => $this->w];
 		}
-		return array ();
+		return [];
 	}
 	
 	/**
@@ -420,7 +418,7 @@ class EMongoClient extends CApplicationComponent
 		for($i = 0; $i < 12; $i ++){
 			$id .= sprintf("%02X", ord($bin[$i]));
 		}
-		return new MongoID($id);
+		return new \MongoID($id);
 	}
 	
 	/**
@@ -429,7 +427,7 @@ class EMongoClient extends CApplicationComponent
 	 * @param array $options
 	 * @return bool
 	 */
-	public function setReadPreference($pref, $options = array())
+	public function setReadPreference($pref, $options = [])
 	{
 		return $this->getConnection()->setReadPreference($pref, $options);
 	}
@@ -475,13 +473,13 @@ class EMongoClient extends CApplicationComponent
 	
 	public function getSerialisedQuery($criteria = [], $fields = [], $sort = [], $skip = 0, $limit = null)
 	{
-		$query = array(
+		$query = [
 			'$query' => $criteria,
 			'$fields' => $fields,
 			'$sort' => $sort,
 			'$skip' => $skip,
 			'$limit' => $limit
-		);
+		];
 		return json_encode($query);
 	}
 	
@@ -492,29 +490,29 @@ class EMongoClient extends CApplicationComponent
 	 */
 	public function getStats()
 	{
-		$logger = Yii::getLogger();
-		$timings = $logger->getProfilingResults(null, 'extensions.MongoYii.EMongoDocument.findOne');
+		/*$logger = Yii::getLogger();
+		$timings = $logger->getProfilingResults(null, 'extensions.MongoYii.\Mongo\Document.findOne');
 		$count = count($timings);
 		$time = array_sum($timings);
-		$timings = $logger->getProfilingResults(null, 'extensions.MongoYii.EMongoDocument.insert');
+		$timings = $logger->getProfilingResults(null, 'extensions.MongoYii.\Mongo\Document.insert');
 		$count += count($timings);
 		$time += array_sum($timings);
-		$timings = $logger->getProfilingResults(null, 'extensions.MongoYii.EMongoDocument.find');
+		$timings = $logger->getProfilingResults(null, 'extensions.MongoYii.\Mongo\Document.find');
 		$count += count($timings);
 		$time += array_sum($timings);
-		$timings = $logger->getProfilingResults(null, 'extensions.MongoYii.EMongoDocument.deleteByPk');
+		$timings = $logger->getProfilingResults(null, 'extensions.MongoYii.\Mongo\Document.deleteByPk');
 		$count += count($timings);
 		$time += array_sum($timings);
-		$timings = $logger->getProfilingResults(null, 'extensions.MongoYii.EMongoDocument.updateByPk');
+		$timings = $logger->getProfilingResults(null, 'extensions.MongoYii.\Mongo\Document.updateByPk');
 		$count += count($timings);
 		$time += array_sum($timings);
-		$timings = $logger->getProfilingResults(null, 'extensions.MongoYii.EMongoDocument.updateAll');
+		$timings = $logger->getProfilingResults(null, 'extensions.MongoYii.\Mongo\Document.updateAll');
 		$count += count($timings);
 		$time += array_sum($timings);
-		$timings = $logger->getProfilingResults(null, 'extensions.MongoYii.EMongoDocument.deleteAll');
+		$timings = $logger->getProfilingResults(null, 'extensions.MongoYii.\Mongo\Document.deleteAll');
 		$count += count($timings);
 		$time += array_sum($timings);
 		
-		return array($count, $time);
+		return array($count, $time);*/
 	}
 }

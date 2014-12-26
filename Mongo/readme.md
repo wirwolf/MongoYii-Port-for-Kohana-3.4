@@ -35,7 +35,7 @@ Once you have the source code in place you need to edit your `main.php` configur
 the following type of configuration:
 
 	'mongodb' => array(
-		'class' => 'EMongoClient',
+		'class' => '\Mongo\Client',
 		'server' => 'mongodb://localhost:27017',
 		'db' => 'super_test'
 	),
@@ -49,18 +49,18 @@ And add the MongoYii directories to your `import` section:
 
 That is the basic setup of the extension.
 
-You will notice that I use a `EMongoClient`. This is a bit deceptive since it actually represents `MongoClient` and `MongoDB` combined.  This means that whenever you call the magic `__call`
-on the `EMongoClient` like so:
+You will notice that I use a `\Mongo\Client`. This is a bit deceptive since it actually represents `MongoClient` and `MongoDB` combined.  This means that whenever you call the magic `__call`
+on the `\Mongo\Client` like so:
 
 	Yii::app()->mongodb->getSomething();
 
-It will either try and call a function of `getSomething` in `EMongoClient` or, if the function does not exist, try and call it within the `MongoDB` class.
+It will either try and call a function of `getSomething` in `\Mongo\Client` or, if the function does not exist, try and call it within the `MongoDB` class.
 
 If you wish to call a function on the `MongoClient` or `Mongo` class you will need to retrieve the connection object like so:
 
 	Yii::app()->mongodb->getConnection()->getSomething();
 
-`EMongoClient` is also designed to handle full write concern and read preferences in a compatible manner with all versions of the driver.
+`\Mongo\Client` is also designed to handle full write concern and read preferences in a compatible manner with all versions of the driver.
 
 **Note:** The models will by default seek a `mongodb` component within your configuration so please make sure that unless you modify the extension, or use it without active record, to
 make your default (master) connection be a component called `mongodb`.
@@ -78,7 +78,7 @@ If you wish to setup the log to insert entries into MongoDB (like in `CDbLogRout
 				[ ... ]
 
 				array(
-					'class'=>'EMongoLogRoute',
+					'class'=>'\Mongo\LogRoute',
 					'connectionId'=>'my_connection_id', // optional, defaults to 'mongodb'
 					'logCollectionName'=>'my_log_collection', // optional, defaults to 'YiiLog'
 				),
@@ -88,7 +88,7 @@ If you wish to setup the log to insert entries into MongoDB (like in `CDbLogRout
 
 ### Providing a custom mongodb component/multiple connections
 
-Each `EMongoDocument` or `EMongoModel` inherited class, i.e. your models will have a overrideable function called `getMongoComponent()`. You can simply override this to 
+Each `\Mongo\Document` or `\Mongo\Model` inherited class, i.e. your models will have a overrideable function called `getMongoComponent()`. You can simply override this to 
 return your custom application component, for example:
 
 	public function getMongoComponent()
@@ -126,10 +126,10 @@ and give it a value according to the [PHP documentation](http://php.net/manual/e
 For those using the 1.3.x series of the driver there is also a `j` option which can be set to either `true` or `false` within the configuration which allows you to control
 whether or not the write is journal acknowledged.
 
-**Note:** Write Concern is abstracted from the driver itself to make this variable compatible across all versions of the driver so please use the configuration or the `EMongoClient` `w` and
+**Note:** Write Concern is abstracted from the driver itself to make this variable compatible across all versions of the driver so please use the configuration or the `\Mongo\Client` `w` and
 `j` class variables to set the write concern when you need to, otherwise that write concern will not be used within active record.
 
-**Note:** Write Concern works differently when you touch the database directly and the write concern issued within the `EMongoClient` class will have no
+**Note:** Write Concern works differently when you touch the database directly and the write concern issued within the `\Mongo\Client` class will have no
 effect. Instead you should always ensure in this case you specify the write concern manually according to your driver version.
 
 This may change in the future but at the moment when you want the active record to go away it just will.
@@ -156,7 +156,7 @@ and for pre-1.3:
 
 	Yii::app()->mongodb->setSlaveOkay(true);
 
-**Note:** Unlike write concern, the `RP` and `setSlaveOkay` variables do not inter-lock between different versions of the driver, using the `EMongoClient` `RP` variable
+**Note:** Unlike write concern, the `RP` and `setSlaveOkay` variables do not inter-lock between different versions of the driver, using the `\Mongo\Client` `RP` variable
 will not translate to `slaveOkay`.
 
 ## Using MongoDB without Active Record
@@ -167,13 +167,13 @@ You can call the database directly at any time using the same implemented method
 
 So the active record element of MongoYii can quickly disappear if needed.
 
-## EMongoModel
+## \Mongo\Model
 
-The `EMongoModel` is a stripped down version of the `EMongoDocument`.
+The `\Mongo\Model` is a stripped down version of the `\Mongo\Document`.
 
-This was made separate from `EMongoDocument` to provide a small and slim active model for use on subdocuments. Whenever you make a class based subdocument you can extend this class.
+This was made separate from `\Mongo\Document` to provide a small and slim active model for use on subdocuments. Whenever you make a class based subdocument you can extend this class.
 
-The `EMongoModel` implements all that `CModel` does but with a few added and changed features.
+The `\Mongo\Model` implements all that `CModel` does but with a few added and changed features.
 
 ### Magic functions
 
@@ -183,7 +183,7 @@ The getters and setters should inherit all of Yiis own functionality.
 
 This extension supports virtual attributes via a doc block notation syntax of `@virtual`, for example:
 
-	class User extends EMongoModel{
+	class User extends \Mongo\Model{
 	    /** @virtual */
 	    public $somevar;
 	}
@@ -207,8 +207,8 @@ As you have guessed, you can only define two types of relation in this extension
 You will recognise a lot of this from Yiis own active record, in fact a lot is the same. We define a name for the relation as a key and then we define either `one` or `many` in text
 (constants seemed useless with only two types) and then we define a class name, `Other` in this case, and then we define the foreign key in that class, `otherId`.
 
-The default behaviour of relations is to attempt to use the primary key, `_id`, of the current model to query the foreign key. This is a problem for `EMongoModel`
-since it has no primary key. Make sure that if you use this in `EMongoModel` you define a `on` clause to replace the primary key of the current model.
+The default behaviour of relations is to attempt to use the primary key, `_id`, of the current model to query the foreign key. This is a problem for `\Mongo\Model`
+since it has no primary key. Make sure that if you use this in `\Mongo\Model` you define a `on` clause to replace the primary key of the current model.
 
 The `on` clause supports multiple field types. It can take a `DBRef` or an `ObjectId` or an array of `ObjectId`s depending on how you define your document.
 
@@ -230,7 +230,7 @@ Versions prior to 5.x do not have relation caching turned on by default.
 
 ### getDocument()
 
-Just gets the docuemnt "as-it-is". This means that if you put meta objects in like nested `EMongoModel`s it will get these back in the output.
+Just gets the docuemnt "as-it-is". This means that if you put meta objects in like nested `\Mongo\Model`s it will get these back in the output.
 
 ### getRawDocument()
 
@@ -244,13 +244,13 @@ Will run `getRawDocument()` and then return its output as a JSON string.
 
 Will run `getRawDocument()` and then return its output as a BSON string.
 
-## EMongoDocument
+## \Mongo\Document
 
-The `EMongoDocument` extends `EMongoModel` and implements all of its features along with the needed features for database accession. It also implements as much as possible of
+The `\Mongo\Document` extends `\Mongo\Model` and implements all of its features along with the needed features for database accession. It also implements as much as possible of
 `CActiveRecord`.
 
 **Note:** The functions that allow database usage are not defined within this section of the documentation. Instead those functions are actually defined within the "Querying" section.
-Please move to the "Querying" section if you wish to read about this part of the `EMongoDocument`.
+Please move to the "Querying" section if you wish to read about this part of the `\Mongo\Document`.
 
 ### collectionName()
 
@@ -262,7 +262,7 @@ Currently only returns `_id` as the key.
 
 ### Using a Custom Primary Key
 
-If you are using a primary key that IS NOT a `ObjectId` (otherwise known as a `MongoId` in the PHP driver) then you should override the `getPrimaryKey` function of the `EMongoDocument`
+If you are using a primary key that IS NOT a `ObjectId` (otherwise known as a `MongoId` in the PHP driver) then you should override the `getPrimaryKey` function of the `\Mongo\Document`
 to not return a `MongoId`:
 
 	public function getPrimaryKey($value=null){
@@ -304,11 +304,11 @@ You can also define your own scopes, however, it is a little different to how yo
 		));
 	}
 
-As you will notice the `_criteria` variable within the EMongoDocument which would normally be a `EMongoCriteria` object is actually completely array based.
+As you will notice the `_criteria` variable within the \Mongo\Document which would normally be a `\Mongo\Criteria` object is actually completely array based.
 
 This applies to all scope actions; they are all array based.
 
-To help you in not having the `EMongoCriteria` object the `EMongoDocument` provides a helper function for merging criteria objects called `mergeCriteria`. Using this function will
+To help you in not having the `\Mongo\Criteria` object the `\Mongo\Document` provides a helper function for merging criteria objects called `mergeCriteria`. Using this function will
 have no impact on the model itself and merely merges criteria to be returned. As an example of using the `mergeCriteria` function:
 
 	function someScope(){
@@ -394,9 +394,9 @@ If you wish to use `int` data types from forms past your systems limits you will
 
 ### Example
 
-So now that we have discussed the `EMongoDocument` lets look at the most base of example:
+So now that we have discussed the `\Mongo\Document` lets look at the most base of example:
 
-	class User extends EMongoDocument{
+	class User extends \Mongo\Document{
 		function collectionName(){
 			return 'users';
 		}
@@ -411,7 +411,7 @@ are needed.
 
 As time goes on you will want to add certain fields like virtual attributes and such to make your life easier:
 
-	class User extends EMongoDocument{
+	class User extends \Mongo\Document{
 
 		/** @virtual */
 		public $agree = 1;
@@ -434,17 +434,17 @@ If you access an array magically you cannot, in the same breath, manipulate it s
 
 ## Querying
 
-Querying attempts to expose the native MongoDB querying language as much as possible. A `EMongoCriteria` class is provided, however, it is not required and does not provide any more functionality
-than just doing it via arrays. The `EMongoCriteria` class is not relied on anywhere and is not needed.
+Querying attempts to expose the native MongoDB querying language as much as possible. A `\Mongo\Criteria` class is provided, however, it is not required and does not provide any more functionality
+than just doing it via arrays. The `\Mongo\Criteria` class is not relied on anywhere and is not needed.
 
 ### Caching
 
-MongoYii, as well supporting full caching through EMongoCacheDependency (see towards the bottom of this documentation), supports active model query caching as 
+MongoYii, as well supporting full caching through \Mongo\CacheDependency (see towards the bottom of this documentation), supports active model query caching as 
 defined in the [documentation](http://www.yiiframework.com/doc/guide/1.1/en/caching.data).
 
 An example of this can be shown by:
 
-	$dep = new EMongoCacheDependency('article', [['_id' => new MongoId('540477726803fad51b8b4568')], 'sort' => ['a' => 1]]);
+	$dep = new \Mongo\CacheDependency('article', [['_id' => new MongoId('540477726803fad51b8b4568')], 'sort' => ['a' => 1]]);
 	$c = Article::model()->cache(4, $dep)->findAll();
 
 The results of `$c` will be drawn from the cache table into your application until the dependency is considered to expire.
@@ -454,7 +454,7 @@ Just like in normal Yii active record you can also say how many queries after th
 ### find()
 
 `find()` is really simple. It is essentially a 1-1 to the drivers own `find()` function and implements the same specifics. Just like the drivers edition, it also returns a cursor
-instance (`EMongoCursor`) which can be used to lazy load results from the database.
+instance (`\Mongo\Cursor`) which can be used to lazy load results from the database.
 
 It will return a cursor irrespective of whether it finds results or not. However if it cannot find results then `count` will return `0` and the iterator will not have any iterations
 to it.
@@ -482,7 +482,7 @@ This may look complicated but I will now break it down for you:
 
 - `User::model()` gets our model
 - `->recently()` is actually a scope, this is not needed but good for demonstration purposes
-- `->find(/*...*/)` is basically the MongoDB drivers `find` method and returns a `EMongoCursor` which implements a `MongoCursor`
+- `->find(/*...*/)` is basically the MongoDB drivers `find` method and returns a `\Mongo\Cursor` which implements a `MongoCursor`
 - `->sort()` is basically the MongoDB drivers `sort` method on the `MongoCursor`
 - `->limit()` is, again, basically the MongoDB drivers own `limit` function on the `MongoCursor`
 
@@ -538,30 +538,30 @@ The validation has pretty much not changed except for the names of certain valid
 
 ### unique
 
-The `unique` validator is now the `EMongoUnqiueValidator`.
+The `unique` validator is now the `\Mongo\UnqiueValidator`.
 
-	array('username', 'EMongoUniqueValidator', 'className' => 'User', 'attributeName' => 'username')
+	array('username', '\Mongo\UniqueValidator', 'className' => 'User', 'attributeName' => 'username')
 	
 ### exist
 
-The `exist` validator is now the `EMongoExistValidator`.
+The `exist` validator is now the `\Mongo\ExistValidator`.
 
-	array('user_id', 'EMongoExistValidator', 'className' => 'User', 'attributeName' => '_id')
+	array('user_id', '\Mongo\ExistValidator', 'className' => 'User', 'attributeName' => '_id')
 	
-### EMongoIdValidator
+### \Mongo\IdValidator
 
 This validator was added as a easy, yet flexible, method to automate the conversion of hexidecimal representation of `MongoId`s (for example: `addffrg33334455add0001`) to the 
 `MongoId` object for database manipulation. This validator can also handle arrays of strings that need converting to `MongoId`s.
 
-	array('ids,id', 'EMongoIdValidator'), // ids is an array while id is a single string value
+	array('ids,id', '\Mongo\IdValidator'), // ids is an array while id is a single string value
 
-### EMongoSubdocumentValidator
+### \Mongo\SubdocumentValidator
 
 This is the subdocument validator, please see the "Subdocuments" section for full documentation.
 
 ## Behaviours
 
-### EMongoTimestampBehaviour
+### \Mongo\TimestampBehaviour
 
 This is the MongoYii edition of `CTimestampBehavior` behaviour and will use `MongoDate` fields, however, an expression can be added to `timestampExpression` to make the 
 behaviour return integer timestamps.
@@ -570,7 +570,7 @@ The usage of the behaviour is very much alike to normal, infact only the name is
 
 	function behaviors(){
 		return array(
-			'EMongoTimestampBehaviour'
+			'\Mongo\TimestampBehaviour'
 		);
 	}
 
@@ -585,7 +585,7 @@ this extension could provide.
 
 So that is a brief understanding of the rationale behind the idea to ditch automatic subdocument handling within the active record.
 
-This does not mean you cannot embed subdocument classes at all; when saving, the active record class will iterate the document and attempt to strip any `EMongoModel` or `EMongoDocument`
+This does not mean you cannot embed subdocument classes at all; when saving, the active record class will iterate the document and attempt to strip any `\Mongo\Model` or `\Mongo\Document`
 classes that have sprung up.
 
 This all aside, there is a subdocument validator and technically it can even accept multi-level nesting. Please bare in mind, though, that it will cause repetition
@@ -647,8 +647,8 @@ application all to itself with its own controller and everything like, for examp
 Now the second question you must ask yourself; are you replacing these subdocuments every time you save them or do you want to use modifiers such as `$push`, `$pull`, `$pullAll`, `$pushAll`,
 `$addToSet` ectera?
 
-If you wish to use modifiers each time then the best way to manage these type of documents is to make the subdocument singular class extend `EMongoModel`, for example, `Comment`
-would extend `EMongoModel`.
+If you wish to use modifiers each time then the best way to manage these type of documents is to make the subdocument singular class extend `\Mongo\Model`, for example, `Comment`
+would extend `\Mongo\Model`.
 
 When, say, adding a comment to a post you would do:
 
@@ -692,11 +692,11 @@ So subdocuments are very flexible in this extension and they do not corner you i
 
 ## Using the ActiveDataProvider
 
-This extension comes with a `CActiveDataProvider` helper called `EMongoDataProvider`. It works exactly the same way except for how it is called.
+This extension comes with a `CActiveDataProvider` helper called `\Mongo\DataProvider`. It works exactly the same way except for how it is called.
 
-Instead of using a `EMongoCriteria` or something similar you use arrays like so:
+Instead of using a `\Mongo\Criteria` or something similar you use arrays like so:
 
-	new EMongoDataProvider(array(
+	new \Mongo\DataProvider(array(
 		'criteria' => array(
 			'condition' => array(),
 			'sort' => array(),
@@ -731,14 +731,14 @@ for a user model:
 
 This is normally the best method because, of course, MongoDB is schemaless (has a flexible schema is more appropriate) so sometimes it doesn't work so well in a rigid table.
 
-## EMongoCriteria
+## \Mongo\Criteria
 
-The `EMongoCriteria` class can help build modular queries across many segments of your application providing an abstracted layer with helper functions enabling you to better create complex
+The `\Mongo\Criteria` class can help build modular queries across many segments of your application providing an abstracted layer with helper functions enabling you to better create complex
 queries.
 
-A brief, yet complete, example of using the `EMongoCriteria` would be:
+A brief, yet complete, example of using the `\Mongo\Criteria` would be:
 
-	$c = new EMongoCriteria();
+	$c = new \Mongo\Criteria();
 	User::model()->find($c
 					->addCondition(array('name' => 'sammaye')) // This is basically a select
 					->addOrCondition(array(array('interest' => 'Drinking'), array('interest' => 'Clubbing'))) // This is adding a $or condition to our select
@@ -750,12 +750,12 @@ So you can see that quickly we can build very complex queries with ease.
 
 Just like with `CDbCriteria` you can also set all of these properties of the query straight from the constructor like so:
 
-	$c = new EMongoCriteria(array(
+	$c = new \Mongo\Criteria(array(
 		'condition' => array('name'=>'sammaye'),
 		'limit' => 10
 	));
 
-The EMongoCriteria class implements many of the functions you would expect of CDbCriteria.
+The \Mongo\Criteria class implements many of the functions you would expect of CDbCriteria.
 
 ### setCondition() / getCondition()
 
@@ -795,7 +795,7 @@ These provide aliases for `getProject()` and `setProject()`.
 
 This works a lot like `CDbCriteria`s and is heavily based on it.
 
-You simply enter `column`, `value` and `matchPartial` parameter values (in that order) and the `EMongoCriteria` class will create a condition and merge it into your current condition
+You simply enter `column`, `value` and `matchPartial` parameter values (in that order) and the `\Mongo\Criteria` class will create a condition and merge it into your current condition
 based upon the entered data. As examples:
 
 	$c->compare('name', 'sammaye');
@@ -808,7 +808,7 @@ It is good to note that the function currently only accepts `AND` conditioning.
 
 ### mergeWith()
 
-Just like in `CDbCriteria` this merges either an array or another `EMongoCriteria` object into this one, transferring all of its properties.
+Just like in `CDbCriteria` this merges either an array or another `\Mongo\Criteria` object into this one, transferring all of its properties.
 
 As an example:
 
@@ -818,7 +818,7 @@ Now `$c` will have all the merged properties of `$otherC`.
 
 ### toArray()
 
-This basically will convert your EMongoCriteria into array form of the syntax:
+This basically will convert your \Mongo\Criteria into array form of the syntax:
 
 	array(
 		'condition' => array(),
@@ -836,7 +836,7 @@ and, by default, is called like:
 
 When you do not wish to retrieve the entire document you can instead just return a partial result.
 
-Both the `EMongoCriteria` and normal array based querying supports projection through two methods. First as a `project` variable in either `EMongoCriteria`:
+Both the `\Mongo\Criteria` and normal array based querying supports projection through two methods. First as a `project` variable in either `\Mongo\Criteria`:
 
 	$c->project=array('_id'=>0,'d'=>1);
 
@@ -852,7 +852,7 @@ And second, as a parameter injected into the read functions of the active record
 
 	User::model()->find(array(),array('_id'=>0,'d'=>1));
 
-These will return `partial=true` `EMongoDocument` instances, either eagerly or in a cursor object. This specification is implemented within all currently existing read functions such as
+These will return `partial=true` `\Mongo\Document` instances, either eagerly or in a cursor object. This specification is implemented within all currently existing read functions such as
 `findOne` and `findBy_id` and `findByPk` however, they are not accepted within the write functions (`update`, `insert`, `save` etc).
 
 When a document is returned as partial it will only save the root level fields that are included within the result of the query.
@@ -865,18 +865,18 @@ root document MongoYii will consider that single projected subdocument the compl
 
 ## GridFS
 
-MongoYii has a GridFS handler called `EMongoFile`. This class is specifically designed as a helper and is in no way required in order to use GridFS with MongoYii. What it does is
+MongoYii has a GridFS handler called `\Mongo\File`. This class is specifically designed as a helper and is in no way required in order to use GridFS with MongoYii. What it does is
 make it easy to upload, save and then retrieve files from GridFS. It is specifically oriented around uploading files from a form.
 
 Let's go through an example of its usage as taken from the example in the [test repository](https://github.com/Sammaye/MongoYii-test/blob/master/protected/controllers/UserController.php#L67).
 To upload a new file from a form you simply call the `populate` static function on the class like so:
 
-	EMongoFile::populate($model,'avatar')
+	\Mongo\File::populate($model,'avatar')
 
 This essentially says: *"Get the uploaded file from the model `user` and the field `avatar`"* The rest works much the same as a normal upload form. If `populate` returns anything except
 `null` then it has found something.
 
-To save the file to GridFS simply call `save()`. The class directly extends `EMongoDocument` as such this means that you have access to all the normal active record stuff as in
+To save the file to GridFS simply call `save()`. The class directly extends `\Mongo\Document` as such this means that you have access to all the normal active record stuff as in
 other classes.
 
 If you wish to add a validator for the file object itself you must point it to the `file` variable of the class; be sure to only allow validators for the file object on `create`
@@ -886,7 +886,7 @@ otherwise Yii will not know how to handle the `MongoGridFSFile` object.
 
 Retreiving the file later is just as easy as saving it and is no different to finding any other record:
 
-	EMongoFile::model()->findOne(array('userId'=>Yii::app()->user->id))
+	\Mongo\File::model()->findOne(array('userId'=>Yii::app()->user->id))
 
 This code snippet assumes we wish to find a file whose metadata field `userId` is of the current user in session.
 
@@ -907,13 +907,13 @@ creators of MongoDB describing its addition to Mongoose](http://aaronheckmann.tu
 
 To setup a versioned document you can simply create a model implementing `version()` which returns `true` and, optionally, `versionField()`:
 
-	class versioned extends EMongoDocument{
+	class versioned extends \Mongo\Document{
 		public versioned(){
 			return true;
 		}
 		
 		public versionField(){
-			return '_v'; // This is actually the default value in EMongoDocument
+			return '_v'; // This is actually the default value in \Mongo\Document
 		}
 		
 		public static function model($className=__CLASS__){
@@ -980,7 +980,7 @@ After that you can just tell PHPUnit to run all tests within the `tests/` folder
 When adding extensive functionality to MongoYii please try and provide the corresponding unit tests. Without the unit tests your functionality, the very same your project most 
 likely relies on, may break in future versions.
 
-If you are intending to contribute changes to MongoYii I should explain my own position on the existance of the `EMongoCriteria` class. I, personally, believe it is not needed.
+If you are intending to contribute changes to MongoYii I should explain my own position on the existance of the `\Mongo\Criteria` class. I, personally, believe it is not needed.
 
 There are a number of reasons why. In SQL an abstraction is justified by, some but not all, of these reasons:
 
@@ -992,18 +992,18 @@ MongoDB suffers from none of these problems; first it has an OO querying interfa
 and most of all it has only one syntax since MongoDB is only one database. On top of this, due to the way MongoDBs querying is built up this class can actually constrict your querying
 and make life a little harder and maybe even create unperformant queries (especially due to how difficult it is to do `$or`s in this class).
 
-As such I believe that the `EMongoCriteria` class is just dead weight consuming memory which I could use for other tasks.
+As such I believe that the `\Mongo\Criteria` class is just dead weight consuming memory which I could use for other tasks.
 
-This extension does not rely on `EMongoCriteria` internally.
+This extension does not rely on `\Mongo\Criteria` internally.
 
-So I expect all modifications to certain parts of MongoYii to be compatible with and without `EMongoCriteria`.
+So I expect all modifications to certain parts of MongoYii to be compatible with and without `\Mongo\Criteria`.
 
 ## Utilities
 
 The `util` folder contains general awesome extensions to MongoYii that people may find useful. The sort of things that count as part of this folder are replacements for internal pieces 
 of Yii that might seem outside of the scope of the root of this repository.
 
-### EMongoCache
+### \Mongo\Cache
 
 This is a MongoYii implementation of `CCache` by [Rajcsányi Zoltán](http://ezmegaz.hu/).
 
@@ -1012,7 +1012,7 @@ To use it first place it in your configuration:
 	'components'=>array(
 		...
 		'cache' => array(
-			'class'=>'application.extensions.MongoYii.util.EMongoCache',
+			'class'=>'application.extensions.MongoYii.util.\Mongo\Cache',
 			// 'ensureIndex' => true, //set to false after first use of the cache
 			// 'mongoConnectionId' => 'mongodb',
 			// 'collectionName' => 'mongodb_cache',		
@@ -1046,7 +1046,7 @@ And now an example of its usage:
 
   	print_r($arr); // Array( [apple] => fruit [1] => [two] => )
   	
-### EMongoMessageSource
+### \Mongo\MessageSource
 
 This is a MongoYii `Yii::t()` implementation by [Rajcsányi Zoltán](http://ezmegaz.hu/).
 
@@ -1055,7 +1055,7 @@ To use it first add it to your configuration:
 	'components' => array(
 		...
 		'messages' => array(
-			'class' => 'application.extensions.MongoYii.util.EMongoMessageSource',
+			'class' => 'application.extensions.MongoYii.util.\Mongo\MessageSource',
 			// 'mongoConnectionId' => 'mongodb', 
 			// 'collectionName' => 'YiiMessages',               
 		)        
@@ -1071,39 +1071,39 @@ And then simply get that message:
   
 	<?=Yii::t('users', 'Freund'); ?>
 	
-### EMongoSession
+### \Mongo\Session
 
 This is a MongoYii `CHttpSession` implementation by yours truly.
 
 To use it simply include it in your configuration:
 
 	'session' => array(
-		'class' => 'application.extensions.MongoYii.util.EMongoSession',
+		'class' => 'application.extensions.MongoYii.util.\Mongo\Session',
 	)
 
 And use it as you would Yiis own normal session.
 
-### EMongoAuthManager
+### \Mongo\AuthManager
 
 This is a MongoDB replacement for Yiis auth manager by [@tvollstaedt](https://github.com/tvollstaedt).
 
 To use it simply place it in your configuration:
 
 	'authManager' => array(
-    	'class' => 'EMongoAuthManager',
+    	'class' => '\Mongo\AuthManager',
     )
     
 It will work the same way as any other auth manager. 
 
 **Note:** You may want to use [Database migrations](#database-migrations) to keep authorization settings across your application instances up to date.
 
-### EMongoPagination
+### \Mongo\Pagination
 
 This is a replacement `CPagination` for MongoYii built by [@kimbeejay](https://github.com/kimbeejay).
 
 It uses the same API as `CPagination` and requires no extra documentation (outside of `CPagination`) aside from making you aware of its existance.
 
-### EMongoCacheDependency
+### \Mongo\CacheDependency
 
 This is to enable MongoYiis edition of [caching](http://www.yiiframework.com/doc/guide/1.1/en/caching.data).
 
@@ -1114,7 +1114,7 @@ Example usage of this class would be:
 		'12', 
 		'dfgdfgf', 
 		30,
-		new EMongoCacheDependency('t', [
+		new \Mongo\CacheDependency('t', [
 			[],
 			'limit' => 5
 		])

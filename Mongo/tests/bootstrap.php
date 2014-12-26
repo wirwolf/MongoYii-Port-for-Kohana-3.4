@@ -3,7 +3,7 @@ $envFile = dirname(__FILE__) . '/config/env.php';
 if(file_exists($envFile)){
 	$env = require_once $envFile;
 }else{
-	$env = array();
+	$env = [];
 }
 
 if(!isset($env['config'])){

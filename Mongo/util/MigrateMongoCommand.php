@@ -1,6 +1,6 @@
 <?php
-
-Yii::import('system.cli.commands.MigrateCommand');
+namespace Mongo\util;
+//Yii::import('system.cli.commands.MigrateCommand');
 
 /**
  * EMigrateMongoCommand manages the database migrations.
@@ -41,7 +41,7 @@ class EMigrateMongoCommand extends MigrateCommand
 	{
 		$limit = isset($args[0]) ? (int)$args[0] : 0;
 		$migrations = $this->getMigrationHistory($limit);
-		if($migrations === array()){
+		if($migrations === []){
 			echo "No migration has been done before.\n";
 		}else{
 			$n = count($migrations);
@@ -80,10 +80,10 @@ class EMigrateMongoCommand extends MigrateCommand
 			if(strpos($migration, $version . '_') === 0){
 				if($this->confirm("Set migration history at $originalVersion?")){
 					for($j = 0; $j <= $i; ++ $j){
-						$collection->save(array(
+						$collection->save([
 							'version' => $migrations[$j],
-							'apply_time' => time() 
-						));
+							'apply_time' => time()
+						]);
 					}
 					echo "The migration history is set at $originalVersion.\nNo actual migration was performed.\n";
 				}
@@ -100,9 +100,9 @@ class EMigrateMongoCommand extends MigrateCommand
 				}else{
 					if($this->confirm("Set migration history at $originalVersion?")){
 						for($j = 0; $j < $i; ++ $j){
-							$collection->delete(array(
-								'version' => $migrations[$j] 
-							));
+							$collection->delete([
+								'version' => $migrations[$j]
+							]);
 						}
 						echo "The migration history is set at $originalVersion.\nNo actual migration was performed.\n";
 					}
@@ -186,10 +186,10 @@ EOD;
 	{
 		echo 'Creating initial migration history record...';
 		
-		$this->getDbConnection()->{$this->collectionName}->save(array(
+		$this->getDbConnection()->{$this->collectionName}->save([
 			'version' => self::BASE_MIGRATION,
-			'apply_time' => time () 
-		));
+			'apply_time' => time ()
+		]);
 		echo "done.\n";
 	}
 	
@@ -207,19 +207,19 @@ EOD;
 	
 	protected function getMigrationHistory($limit)
 	{
-		return CHtml::listData(iterator_to_array($this->getDbConnection()->{$this->collectionName}->find()->sort(array(
-			'version' => - 1 
-		))->limit($limit)), 'version', 'apply_time');
+		return CHtml::listData(iterator_to_array($this->getDbConnection()->{$this->collectionName}->find()->sort([
+			'version' => - 1
+		])->limit($limit)), 'version', 'apply_time');
 	}
 	
 	protected function getNewMigrations()
 	{
-		$applied = array();
+		$applied = [];
 		foreach($this->getMigrationHistory(0) as $version => $time){
 			$applied[substr($version, 1, 13)] = true;
 		}
 		
-		$migrations = array();
+		$migrations = [];
 		$handle = opendir($this->migrationPath);
 		while(($file = readdir($handle)) !== false){
 			if($file === '.' || $file === '..'){
@@ -269,9 +269,9 @@ EOD;
 		$start = microtime(true);
 		$migration = $this->instantiateMigration($class);
 		if($migration->down() !== false){
-			$this->getDbConnection()->{$this->collectionName}->remove(array(
-				'version' => $class 
-			));
+			$this->getDbConnection()->{$this->collectionName}->remove([
+				'version' => $class
+			]);
 			$time = microtime(true) - $start;
 			echo "*** reverted $class (time: " . sprintf("%.3f", $time) . "s)\n\n";
 		}else{
@@ -291,10 +291,10 @@ EOD;
 		$start = microtime(true);
 		$migration = $this->instantiateMigration($class);
 		if($migration->up() !== false){
-			$this->getDbConnection()->{$this->collectionName}->save(array(
+			$this->getDbConnection()->{$this->collectionName}->save([
 				'version' => $class,
-				'apply_time' => time() 
-			));
+				'apply_time' => time()
+			]);
 			$time = microtime(true) - $start;
 			echo "*** applied $class (time: " . sprintf("%.3f", $time) . "s)\n\n";
 		}else{

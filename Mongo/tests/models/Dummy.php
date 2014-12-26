@@ -6,6 +6,6 @@ class Dummy extends EMongoModel
 	
 	public function rules()
 	{
-		return array();
+		return [];
 	}
 }

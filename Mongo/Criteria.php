@@ -1,5 +1,5 @@
 <?php
-
+namespace Mongo;
 /**
  * This is the extensions version of CDbCriteria.
  *
@@ -11,17 +11,17 @@
  * @property int $limit
  * @property array $project
  */
-class EMongoCriteria extends CComponent
+class Criteria extends CComponent
 {
 	/**
 	 * @var array
 	 */
-	private $_condition = array();
+	private $_condition = [];
 	
 	/**
 	 * @var array
 	 */
-	private $_sort = array();
+	private $_sort = [];
 	
 	/**
 	 * @var int
@@ -39,13 +39,13 @@ class EMongoCriteria extends CComponent
 	 * is what it is called in MongoDB, basically it is SELECT though.
 	 * @var array
 	 */
-	private $_project = array();
+	private $_project = [];
 
 	/**
 	 * Constructor.
 	 * @param array $data - criteria initial property values (indexed by property name)
 	*/
-	public function __construct($data = array())
+	public function __construct($data = [])
 	{
 		foreach($data as $name => $value){
 			$this->$name = $value;
@@ -55,9 +55,9 @@ class EMongoCriteria extends CComponent
 	/**
 	 * Sets the condition
 	 * @param array $condition
-	 * @return EMongoCriteria
+	 * @return \Mongo\Criteria
 	 */
-	public function setCondition(array $condition=array())
+	public function setCondition(array $condition= [])
 	{
 		$this->_condition = CMap::mergeArray($condition, $this->_condition);
 		return $this;
@@ -75,7 +75,7 @@ class EMongoCriteria extends CComponent
 	/**
 	 * Sets the sort
 	 * @param array $sort
-	 * @return EMongoCriteria
+	 * @return \Mongo\Criteria
 	 */
 	public function setSort(array $sort)
 	{
@@ -103,7 +103,7 @@ class EMongoCriteria extends CComponent
 	/**
 	 * Sets the skip
 	 * @param int $skip
-	 * @return EMongoCriteria
+	 * @return \Mongo\Criteria
 	 */
 	public function setSkip($skip)
 	{
@@ -123,7 +123,7 @@ class EMongoCriteria extends CComponent
 	/**
 	 * Sets the limit
 	 * @param int $limit
-	 * @return EMongoCriteria
+	 * @return \Mongo\Criteria
 	 */
 	public function setLimit($limit)
 	{
@@ -143,7 +143,7 @@ class EMongoCriteria extends CComponent
 	/**
 	 * Sets the projection (SELECT in MongoDB Lingo) of the criteria
 	 * @param array $document - The document specification for projection
-	 * @return EMongoCriteria
+	 * @return \Mongo\Criteria
 	 */
 	public function setProject($document)
 	{
@@ -163,9 +163,9 @@ class EMongoCriteria extends CComponent
 
 	/**
 	 * An alias for those too used to select
-	 * @see EMongoCriteria::setProject()
+	 * @see \Mongo\Criteria::setProject()
 	 * @param array $document
-	 * @return EMongoCriteria
+	 * @return \Mongo\Criteria
 	 */
 	public function setSelect($document)
 	{
@@ -174,7 +174,7 @@ class EMongoCriteria extends CComponent
 
 	/**
 	 * An alias for those too used to select
-	 * @see EMongoCriteria::getProject()
+	 * @see \Mongo\Criteria::getProject()
 	 * @return array
 	 */
 	public function getSelect()
@@ -188,22 +188,22 @@ class EMongoCriteria extends CComponent
 	 * @param string $column
 	 * @param mixed $value
 	 * @param string $operator
-	 * @return EMongoCriteria
+	 * @return \Mongo\Criteria
 	 */
 	public function addCondition($column, $value, $operator = null)
 	{
-		$this->_condition[$column] = $operator === null ? $value : array($operator => $value);
+		$this->_condition[$column] = $operator === null ? $value : [$operator => $value];
 		return $this;
 	}
 
 	/**
 	 * Adds an $or condition to the criteria, will overwrite other $or conditions
 	 * @param array $condition
-	 * @return EMongoCriteria
+	 * @return \Mongo\Criteria
 	 */
 	public function addOrCondition($condition)
 	{
-		$this->_condition['$and'][] = array('$or' => $condition);
+		$this->_condition['$and'][] = ['$or' => $condition];
 		return $this;
 	}
 
@@ -212,16 +212,16 @@ class EMongoCriteria extends CComponent
 	 * @param string $column
 	 * @param string|null $value
 	 * @param boolean $partialMatch
-	 * @return EMongoCriteria
+	 * @return \Mongo\Criteria
 	 */
 	public function compare($column, $value = null, $partialMatch = false)
 	{
-		$query = array();
+		$query = [];
 		
 		if($value === null){
 			$query[$column] = null;
 		}elseif(is_array($value)){
-			$query[$column] = array('$in' => $value);
+			$query[$column] = ['$in' => $value];
 		}elseif(is_object($value)){
 			$query[$column] = $value;
 		}elseif(is_bool($value)){
@@ -245,19 +245,19 @@ class EMongoCriteria extends CComponent
 
 			switch($op){
 				case "<>":
-					$query[$column] = array('$ne' => $value);
+					$query[$column] = ['$ne' => $value];
 					break;
 				case "<=":
-					$query[$column] = array('$lte' => $value);
+					$query[$column] = ['$lte' => $value];
 					break;
 				case ">=":
-					$query[$column] = array('$gte' => $value);
+					$query[$column] = ['$gte' => $value];
 					break;
 				case "<":
-					$query[$column] = array('$lt' => $value);
+					$query[$column] = ['$lt' => $value];
 					break;
 				case ">":
-					$query[$column] = array('$gt' => $value);
+					$query[$column] = ['$gt' => $value];
 					break;
 				case "=":
 				default:
@@ -274,12 +274,12 @@ class EMongoCriteria extends CComponent
 
 	/**
 	 * Merges either an array of criteria or another criteria object with this one
-	 * @param array|EMongoCriteria $criteria
-	 * @return EMongoCriteria
+	 * @param array|\Mongo\Criteria $criteria
+	 * @return \Mongo\Criteria
 	 */
 	public function mergeWith($criteria)
 	{
-		if($criteria instanceof EMongoCriteria){
+		if($criteria instanceof \Mongo\Criteria){
 			return $this->mergeWith($criteria->toArray());
 		}
 		if(is_array($criteria)){
@@ -304,16 +304,16 @@ class EMongoCriteria extends CComponent
 
 	/**
 	 * @param boolean $onlyCondition -  indicates whether to return only condition part or criteria.
-	 * Should be "true" if the criteria is used in EMongoDocument::find() and other common find methods.
+	 * Should be "true" if the criteria is used in \Mongo\Document::find() and other common find methods.
 	 * @return array - native representation of the criteria
 	 */
 	public function toArray($onlyCondition = false)
 	{
-		$result = array();
+		$result = [];
 		if($onlyCondition === true){
 			$result = $this->condition;
 		}else{
-			foreach(array('_condition', '_limit', '_skip', '_sort', '_project') as $name){
+			foreach(['_condition', '_limit', '_skip', '_sort', '_project'] as $name){
 				$result[substr($name, 1)] = $this->$name;
 			}
 		}

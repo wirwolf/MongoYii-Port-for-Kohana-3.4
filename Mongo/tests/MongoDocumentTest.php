@@ -11,35 +11,35 @@ class MongoDocumentTest extends CTestCase
 
 	public function setUpRelationalModel()
 	{
-		$parentDocs = array(
-			array('username' => 'sam', 'job_title' => 'awesome guy'),
-			array('username' => 'john', 'job_title' => 'co-awesome guy'),
-			array('username' => 'dan', 'job_title' => 'programmer'),
-			array('username' => 'lewis', 'job_title' => 'programmer'),
-			array('username' => 'ant', 'job_title' => 'programmer')
-		);
+		$parentDocs = [
+			['username' => 'sam', 'job_title' => 'awesome guy'],
+			['username' => 'john', 'job_title' => 'co-awesome guy'],
+			['username' => 'dan', 'job_title' => 'programmer'],
+			['username' => 'lewis', 'job_title' => 'programmer'],
+			['username' => 'ant', 'job_title' => 'programmer']
+		];
 
-		$childDocs = array(
-			array('name' => 'jogging'),
-			array('name' => 'computers'),
-			array('name' => 'biking'),
-			array('name' => 'drinking'),
-			array('name' => 'partying'),
-			array('name' => 'cars')
-		);
+		$childDocs = [
+			['name' => 'jogging'],
+			['name' => 'computers'],
+			['name' => 'biking'],
+			['name' => 'drinking'],
+			['name' => 'partying'],
+			['name' => 'cars']
+		];
 
-		$docsLinkedByDBRef=array(
-			array('name' => 'python'),
-			array('name' => 'java'),
-			array('name' => 'php'),
-			array('name' => 'lisp'),
-			array('name' => 'C'),
-			array('name' => 'Objective C'),
-			array('name' => 'C++'),
-			array('name' => 'ruby'),
-		);
+		$docsLinkedByDBRef=[
+			['name' => 'python'],
+			['name' => 'java'],
+			['name' => 'php'],
+			['name' => 'lisp'],
+			['name' => 'C'],
+			['name' => 'Objective C'],
+			['name' => 'C++'],
+			['name' => 'ruby'],
+		];
 
-		foreach(array(array('class' => 'Interest','data' => $childDocs), array('class' => 'Skill','data' => $docsLinkedByDBRef)) as $subgroup){
+		foreach([['class' => 'Interest','data' => $childDocs], ['class' => 'Skill','data' => $docsLinkedByDBRef]] as $subgroup){
 			foreach($subgroup['data'] as $doc){
 				$i = new $subgroup['class']();
 				foreach($doc as $k => $v){
@@ -56,13 +56,13 @@ class MongoDocumentTest extends CTestCase
 		$this->assertTrue($c->count() > 0);
 
 		// Let's build an array of the all the _ids of the child docs
-		$interest_ids = array();
+		$interest_ids = [];
 		foreach($c as $row){
 			$interest_ids[] = $row->_id;
 		}
 
 		// Create the users with each doc having the value of the interest ids
-		$user_ids = array();
+		$user_ids = [];
 		foreach($parentDocs as $doc){
 			$u = new User();
 			foreach($doc as $k=>$v){
@@ -75,7 +75,7 @@ class MongoDocumentTest extends CTestCase
 			$u->mainSkill = MongoDBRef::create(Skill::model()->collectionName(), $primarySkill);
 
 			//Now, lets pick array of secondary skills
-			$allSecondarySkills = array();
+			$allSecondarySkills = [];
 			foreach(array_rand($skills, rand(3, 5)) as $secondarySkill){
 				if ($secondarySkill == $primarySkill){
 					continue;
@@ -112,23 +112,23 @@ class MongoDocumentTest extends CTestCase
 	
 	public function setUpProperSubdocumentErrorsIndexationTest()
 	{
-		return array(
-			array(
-				array(
+		return [
+			[
+				[
 				'username'=>'kate',
-				'addresses'=>array(
-					0 => array(
+				'addresses'=>[
+					0 => [
 						'country' => 'Ukraine',
 						'telephone' => 11111
-					),
-					1 => array(
+					],
+					1 => [
 						'country' => 'Russia',
 						'telephone' => 'wrongString'
-					)
-				)
-				)
-			)
-		);
+					]
+				]
+				]
+			]
+		];
 	}
 
 	public function tearDown()
@@ -160,7 +160,7 @@ class MongoDocumentTest extends CTestCase
 			$this->assertTrue($doc->save());
 		}
 		// Dan, is it you? 
-		$r = User::model()->findOne(array('username' => 'dan') , array('username' => 1));
+		$r = User::model()->findOne(['username' => 'dan'] , ['username' => 1]);
 		$this->assertEquals('dan', $r->username);
 	}
 
@@ -188,7 +188,7 @@ class MongoDocumentTest extends CTestCase
 		$c->username = 'sally';
 		$this->assertTrue($c->save());
 
-		$r = User::model()->findOne(array('username' => 'sally') , array('username' => 1));
+		$r = User::model()->findOne(['username' => 'sally'] , ['username' => 1]);
 		$this->assertTrue($r->count() > 0);
 		$this->assertEquals('sally', $r->username);
 	}
@@ -226,12 +226,12 @@ class MongoDocumentTest extends CTestCase
 		$r = User::model()->findAllByPk((string)$c->_id);
 		$this->assertTrue(!is_null($r));
 		
-		$r = User::model()->findAllByPk(array((string)$c->_id));
+		$r = User::model()->findAllByPk([(string)$c->_id]);
 		$this->assertTrue(!is_null($r));
 
 		$this->assertInstanceOf('EMongoCursor', $r);
 
-		$r = User::model()->findOne(array('_id' => $c->_id) , array('username' => 1));
+		$r = User::model()->findOne(['_id' => $c->_id] , ['username' => 1]);
 		$this->assertEquals('harry', $r->username);
 	}
 
@@ -244,9 +244,9 @@ class MongoDocumentTest extends CTestCase
 		$c->username = 'sammaye';
 		$this->assertTrue($c->save());
 
-		$c->updateByPk($c->_id, array('$set' => array('username' => 'gfgfgf')));
+		$c->updateByPk($c->_id, ['$set' => ['username' => 'gfgfgf']]);
 
-		$r = User::model()->findOne(array('username' => 'gfgfgf'));
+		$r = User::model()->findOne(['username' => 'gfgfgf']);
 		$this->assertInstanceOf('EMongoDocument', $r);
 		$this->assertEquals('gfgfgf', $r->username);
 	}
@@ -277,12 +277,12 @@ class MongoDocumentTest extends CTestCase
 			$this->assertTrue($c->save());
 		}
 
-		$c->updateAll(array('username' => 'frodo'), array('$set' => array('username' => 'gdgdgd')));
+		$c->updateAll(['username' => 'frodo'], ['$set' => ['username' => 'gdgdgd']]);
 
-		$r = User::model()->findOne(array('username' => 'gdgdgd'));
+		$r = User::model()->findOne(['username' => 'gdgdgd']);
 		$this->assertInstanceOf('EMongoDocument', $r);
 
-		$r = User::model()->find(array('username' => 'gdgdgd'));
+		$r = User::model()->find(['username' => 'gdgdgd']);
 		$this->assertEquals(4, $r->count());
 	}
 
@@ -312,11 +312,11 @@ class MongoDocumentTest extends CTestCase
 		$c->mainSkill = 'LoTR';
 		$this->assertTrue($c->save());
 
-		$r = User::model()->find(array('mainSkill' => 'LoTR'));
+		$r = User::model()->find(['mainSkill' => 'LoTR']);
 		$this->assertEquals(10, $r->count());
 
-		$c->deleteAll(array('username' => 'ringwraith'));
-		$r = User::model()->find(array('mainSkill' => 'LoTR'));
+		$c->deleteAll(['username' => 'ringwraith']);
+		$r = User::model()->find(['mainSkill' => 'LoTR']);
 		$this->assertEquals(1, $r->count());
 	}
 
@@ -330,7 +330,7 @@ class MongoDocumentTest extends CTestCase
 		$this->assertTrue($c->save());
 
 		$c->job_title = 'wizard';
-		$r = $c->saveAttributes(array('job_title'));
+		$r = $c->saveAttributes(['job_title']);
 		$this->assertNull($r['err']);
 
 		$r = User::model()->findOne();
@@ -341,7 +341,7 @@ class MongoDocumentTest extends CTestCase
 		$c->username = 'radagast';
 		$c->job_title = 'wizard';
 		$this->setExpectedException('EMongoException');
-		$c->saveAttributes(array('job_title'));
+		$c->saveAttributes(['job_title']);
 	}
 
 	public function testPartialDocuments()
@@ -350,14 +350,14 @@ class MongoDocumentTest extends CTestCase
 		$u->username = 'sammaye';
 		$this->assertTrue($u->save());
 
-		$r = User::model()->findOne(array(), array('username' => 1));
+		$r = User::model()->findOne([], ['username' => 1]);
 		$this->assertTrue($r->getIsPartial());
 
 		$p = $r->getProjectedFields();
 		$this->assertTrue(isset($p['username'], $p['_id']));
 		$this->assertFalse(isset($p['addresses']));
 
-		$r2 = User::model()->find(array(), array('username' => 1));
+		$r2 = User::model()->find([], ['username' => 1]);
 		foreach($r2 as $row){
 			$this->assertTrue($row->getIsPartial());
 		}
@@ -422,7 +422,7 @@ class MongoDocumentTest extends CTestCase
 		$this->setUpRelationalModel();
 		$r = User::model()->findOne();
 
-		$rel = $r->many_interests(array('name' => 'computers'));
+		$rel = $r->many_interests(['name' => 'computers']);
 		// No longer valid due to relation caching
 		//$this->assertInstanceOf('EMongoCursor', $rel);
 		$this->assertTrue(count($rel) > 0);
@@ -490,16 +490,16 @@ class MongoDocumentTest extends CTestCase
 	{
 		$c = new User;
 		$c->username = 'sammaye';
-		$c->addresses = array(
-			array('road' => 12, 'town' => 'yo', 'county' => 23, 'post_code' => 'g', 'telephone' => 'ggg')
-		);
+		$c->addresses = [
+			['road' => 12, 'town' => 'yo', 'county' => 23, 'post_code' => 'g', 'telephone' => 'ggg']
+		];
 		$this->assertFalse($c->validate());
 
 		$c = new User;
 		$c->username = 'sammaye';
-		$c->addresses = array(
-			array('road' => 's', 'town' => 'yo', 'county' => 'sa', 'post_code' => 'g', 'telephone' => 23)
-		);
+		$c->addresses = [
+			['road' => 's', 'town' => 'yo', 'county' => 'sa', 'post_code' => 'g', 'telephone' => 23]
+		];
 		$this->assertTrue($c->validate());
 	}
 
@@ -530,10 +530,11 @@ class MongoDocumentTest extends CTestCase
 		$this->assertTrue($c->validate());
 		$this->assertTrue(!$c->url instanceof SocialUrl);
 	}
-	
+
 	/**
-	 * @covers ESubdocumentValidator
+	 * @covers       ESubdocumentValidator
 	 * @dataProvider setUpProperSubdocumentErrorsIndexationTest
+	 * @param $post
 	 */
 	public function testProperSubdocumentErrorsIndexation($post)
 	{
@@ -552,7 +553,7 @@ class MongoDocumentTest extends CTestCase
 		$c = new User;
 		$c->username = 'sammaye';
 		$this->assertTrue($c->save());
-		$this->assertTrue(User::model()->exists(array('username' => 'sammaye')));
+		$this->assertTrue(User::model()->exists(['username' => 'sammaye']));
 	}
 
 	/**
@@ -564,19 +565,19 @@ class MongoDocumentTest extends CTestCase
 		$c->username = 'sammaye';
 		$this->assertTrue($c->save());
 
-		$d=User::model()->findOne(array('username' => 'sammaye'));
+		$d=User::model()->findOne(['username' => 'sammaye']);
 		$this->assertTrue($c->equals($d));
 	}
 
 	public function testScopes()
 	{
-		$parentDocs = array(
-			array('username' => 'sam', 'job_title' => 'awesome guy'),
-			array('username' => 'john', 'job_title' => 'co-awesome guy'),
-			array('username' => 'dan', 'job_title' => 'programmer'),
-			array('username' => 'lewis', 'job_title' => 'programmer'),
-			array('username' => 'ant', 'job_title' => 'programmer')
-		);
+		$parentDocs = [
+			['username' => 'sam', 'job_title' => 'awesome guy'],
+			['username' => 'john', 'job_title' => 'co-awesome guy'],
+			['username' => 'dan', 'job_title' => 'programmer'],
+			['username' => 'lewis', 'job_title' => 'programmer'],
+			['username' => 'ant', 'job_title' => 'programmer']
+		];
 
 		foreach($parentDocs as $doc){
 			$c = new User;
@@ -627,22 +628,22 @@ class MongoDocumentTest extends CTestCase
 		$c->username = 'sammaye';
 		$this->assertTrue($c->save());
 
-		$c->saveCounters(array('i' => 1));
+		$c->saveCounters(['i' => 1]);
 		$this->assertTrue($c->i == 1);
 
-		$d = User::model()->findOne(array('username' => 'sammaye'));
+		$d = User::model()->findOne(['username' => 'sammaye']);
 		$this->assertTrue($d->i == 1);
 
-		$c->saveCounters(array('i' => -1));
+		$c->saveCounters(['i' => -1]);
 		$this->assertTrue($c->i == 0);
 
-		$e = User::model()->findOne(array('username' => 'sammaye'));
+		$e = User::model()->findOne(['username' => 'sammaye']);
 		$this->assertTrue($e->i == 0);
 
 		$f = new User;
 		$f->username = 'merry';
 		$this->setExpectedException('EMongoException');
-		$f->saveCounters(array('i' => 1));
+		$f->saveCounters(['i' => 1]);
 	}
 	
 	public function testVersioning()
@@ -651,7 +652,7 @@ class MongoDocumentTest extends CTestCase
 		$m->name = "sammaye";
 		$this->assertTrue($m->save());
 
-		$o = versionedDocument::model()->findOne(array('_id' => $m->_id));
+		$o = versionedDocument::model()->findOne(['_id' => $m->_id]);
 		$o->name = "meh";
 		$this->assertTrue($o->save());
 		
@@ -665,10 +666,10 @@ class MongoDocumentTest extends CTestCase
 		$m->name = "sammaye";
 		$this->assertTrue($m->save()); // 1
 
-		$o = versionedDocument::model()->findOne(array('_id' => $m->_id));
+		$o = versionedDocument::model()->findOne(['_id' => $m->_id]);
 		$this->assertTrue($o->incrementVersion()); // 2
 		
-		$oo = versionedDocument::model()->findOne(array('_id' => $m->_id));
+		$oo = versionedDocument::model()->findOne(['_id' => $m->_id]);
 		$this->assertEquals(2, $oo->version());
 	}
 	
@@ -678,10 +679,10 @@ class MongoDocumentTest extends CTestCase
 		$m->name = "sammaye";
 		$this->assertTrue($m->save()); // 1
 
-		$o = versionedDocument::model()->findOne(array('_id' => $m->_id));
+		$o = versionedDocument::model()->findOne(['_id' => $m->_id]);
 		$this->assertTrue($o->setVersion(4)); // 4
 		
-		$oo = versionedDocument::model()->findOne(array('_id' => $m->_id));
+		$oo = versionedDocument::model()->findOne(['_id' => $m->_id]);
 		$this->assertEquals(4, $oo->version());
 	}
 	

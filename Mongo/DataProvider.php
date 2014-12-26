@@ -1,11 +1,11 @@
 <?php
-
+namespace Mongo;
 /**
- * EMongoDataProvider
+ * \Mongo\DataProvider
  *
- * A data Provider helper for interacting with the EMongoCursor
+ * A data Provider helper for interacting with the \Mongo\Cursor
  */
-class EMongoDataProvider extends CActiveDataProvider
+class DataProvider extends CActiveDataProvider
 {
 	/**
 	 * The primary ActiveRecord class name. The {@link getData()} method
@@ -18,7 +18,7 @@ class EMongoDataProvider extends CActiveDataProvider
 	 * The AR finder instance (eg <code>Post::model()</code>).
 	 * This property can be set by passing the finder instance as the first parameter
 	 * to the constructor. For example, <code>Post::model()->published()</code>.
-	 * @var EMongoModel
+	 * @var \Mongo\Model
 	 */
 	public $model;
 	
@@ -36,26 +36,26 @@ class EMongoDataProvider extends CActiveDataProvider
 	
 	/**
 	 * The internal MongoDB cursor as a MongoCursor instance
-	 * @var EMongoCursor|MongoCursor
+	 * @var \Mongo\Cursor|MongoCursor
 	 */
 	private $_cursor;
 	
 	/**
-	 * @var EMongoSort
+	 * @var \Mongo\Sort
 	 */
 	private $_sort;
 
 	/**
-	 * Creates the EMongoDataProvider instance
-	 * @param string|EMongoDocument $modelClass
+	 * Creates the \Mongo\DataProvider instance
+	 * @param string|\Mongo\Document $modelClass
 	 * @param array $config
 	 */
-	public function __construct($modelClass, $config = array())
+	public function __construct($modelClass, $config = [])
 	{
 		if(is_string($modelClass)){
 			$this->modelClass = $modelClass;
-			$this->model = EMongoDocument::model($this->modelClass);
-		}elseif($modelClass instanceof EMongoDocument){
+			$this->model = \Mongo\Document::model($this->modelClass);
+		}elseif($modelClass instanceof \Mongo\Document){
 			$this->modelClass = get_class($modelClass);
 			$this->model = $modelClass;
 		}
@@ -76,11 +76,11 @@ class EMongoDataProvider extends CActiveDataProvider
 
 	/**
 	 * @see CActiveDataProvider::setCriteria()
-	 * @param array|EMongoCriteria $value
+	 * @param array|\Mongo\Criteria $value
 	 */
 	public function setCriteria($value)
 	{
-		if($value instanceof EMongoCriteria){
+		if($value instanceof \Mongo\Criteria){
 			$this->_criteria = $value->toArray();
 		}
 		if(is_array($value)){
@@ -98,8 +98,8 @@ class EMongoDataProvider extends CActiveDataProvider
 
 		// I have not refactored this line considering that the condition may have changed from total item count to here, maybe.
 		$this->_cursor = $this->model->find(
-			isset($criteria['condition']) && is_array($criteria['condition']) ? $criteria['condition'] : array(),
-			isset($criteria['project']) && !empty($criteria['project']) ? $criteria['project'] : array() 
+			isset($criteria['condition']) && is_array($criteria['condition']) ? $criteria['condition'] : [],
+			isset($criteria['project']) && !empty($criteria['project']) ? $criteria['project'] : []
 		);
 
 		// If we have sort and limit and skip setup within the incoming criteria let's set it
@@ -138,7 +138,7 @@ class EMongoDataProvider extends CActiveDataProvider
 	 */
 	public function fetchKeys()
 	{
-		$keys = array();
+		$keys = [];
 		foreach($this->getData() as $i => $data){
 			$key = $this->keyAttribute === null ? $data->{$data->primaryKey()} : $data->{$this->keyAttribute};
 			$keys[$i] = is_array($key) ? implode(',', $key) : $key;
@@ -154,7 +154,7 @@ class EMongoDataProvider extends CActiveDataProvider
 	{
 		if(!$this->_cursor){
 			$criteria = $this->getCriteria();
-			$this->_cursor = $this->model->find(isset($criteria['condition']) && is_array($criteria['condition']) ? $criteria['condition'] : array());
+			$this->_cursor = $this->model->find(isset($criteria['condition']) && is_array($criteria['condition']) ? $criteria['condition'] : []);
 		}
 		return $this->_cursor->count();
 	}
@@ -163,9 +163,9 @@ class EMongoDataProvider extends CActiveDataProvider
 	 * Returns the sort object. We don't use the newer getSort function because it does not have the same functionality
 	 * between 1.1.10 and 1.1.13, the functionality we need is actually in 1.1.13 only
 	 * @param string $className
-	 * @return CSort|EMongoSort|false - the sorting object. If this is false, it means the sorting is disabled.
+	 * @return CSort|\Mongo\Sort|false - the sorting object. If this is false, it means the sorting is disabled.
 	 */
-	public function getSort($className = 'EMongoSort')
+	public function getSort($className = '\Mongo\Sort')
 	{
 		if($this->_sort === null){
 			$this->_sort = new $className;

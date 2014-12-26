@@ -9,12 +9,12 @@ class UserTsTest extends EMongoDocument
 
 	public function behaviors()
 	{
-		return array(
-			'EMongoTimestampBehaviour' => array(
+		return [
+			'EMongoTimestampBehaviour' => [
 				'class' => 'EMongoTimestampBehaviour',
-				'onScenario' => array('testMe'),
-			)
-		);
+				'onScenario' => ['testMe'],
+			]
+		];
 	}
 
 	public function collectionName()
@@ -32,12 +32,12 @@ class UserTsTestBroken extends EMongoDocument
 
 	public function behaviors()
 	{
-		return array(
-			'EMongoTimestampBehaviour' => array(
+		return [
+			'EMongoTimestampBehaviour' => [
 				'class' => 'EMongoTimestampBehaviour',
 				'onScenario' => 'testMeFalse',
-			)
-		);
+			]
+		];
 	}
 
 	public function collectionName()
@@ -56,13 +56,13 @@ class UserTsTestBroken2 extends EMongoDocument
 
 	public function behaviors()
 	{
-		return array(
-			'EMongoTimestampBehaviour' => array(
+		return [
+			'EMongoTimestampBehaviour' => [
 				'class' => 'EMongoTimestampBehaviour',
-				'onScenario' => array('testMeFalseOn'),
-				'notOnScenario' => array('testMeFalseOn'),
-			)
-		);
+				'onScenario' => ['testMeFalseOn'],
+				'notOnScenario' => ['testMeFalseOn'],
+			]
+		];
 	}
 
 	public function collectionName()

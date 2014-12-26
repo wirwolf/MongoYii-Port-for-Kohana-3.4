@@ -1,4 +1,5 @@
 <?php
+namespace Mongo\util;
 /**
  * EMongoCacheDependency represents a dependency based on the query result of a Mongo Query.
  *
@@ -14,13 +15,15 @@ class EMongoCacheDependency extends CCacheDependency
 	
 	public $collection = null;
 	
-	public $query = array();
+	public $query = [];
 	
 	private $_db;
 
 	/**
 	 * Constructor.
-	 * @param string $cursor the Mongo Cursor whose result is used to determine if the dependency has been changed.
+	 * @param $collection
+	 * @param null $query
+	 * @internal param string $cursor the Mongo Cursor whose result is used to determine if the dependency has been changed.
 	 */
 	public function __construct($collection, $query = null)
 	{
@@ -42,8 +45,9 @@ class EMongoCacheDependency extends CCacheDependency
 	/**
 	 * Generates the data needed to determine if dependency has been changed.
 	 * This method returns the value of the global state.
-	 * @throws CException if {@link cursor} is empty
-	 * @return mixed the data needed to determine if dependency has been changed.
+	 * @return mixed if {@link cursor} is empty
+	 * is empty
+	 * @throws EMongoException
 	 */
 	protected function generateDependentData()
 	{
@@ -68,7 +72,7 @@ class EMongoCacheDependency extends CCacheDependency
 	
 	protected function createCursor()
 	{
-		$query = array();
+		$query = [];
 		if(isset($this->query[0])){
 			$query = $this->query[0];
 		}
@@ -89,10 +93,10 @@ class EMongoCacheDependency extends CCacheDependency
 		
 		return $cursor;
 	}
-	
+
 	/**
 	 * @return CDbConnection the DB connection instance
-	 * @throws CException if {@link connectionID} does not point to a valid application component.
+	 * @throws EMongoException
 	 */
 	protected function getDbConnection()
 	{
@@ -106,7 +110,7 @@ class EMongoCacheDependency extends CCacheDependency
 					Yii::t(
 						'yii', 
 						'EMongoCacheDependency.connectionID "{id}" is invalid. Please make sure it refers to the ID of a EMongoClient application component.',
-						array('{id}' => $this->connectionID)
+						['{id}' => $this->connectionID]
 					)
 				);
 			}

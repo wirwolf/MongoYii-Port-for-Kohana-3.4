@@ -1,7 +1,7 @@
 <?php
-
+namespace Mongo;
 /**
- * EMongoCursor
+ * \Mongo\Cursor
  *
  * Represents the Yii edition to the MongoCursor and allows for lazy loading of objects.
  *
@@ -11,12 +11,12 @@
  * I did try originally to make this into a active data provider and use this for two fold operations but the cactivedataprovider would extend
  * a lot for the cursor and the two took quite different constructors.
  */
-class EMongoCursor implements Iterator, Countable
+class Cursor implements Iterator, Countable
 {
 	/**
-	 * @var array|EMongoCriteria
+	 * @var array|\Mongo\Criteria
 	 */
-	public $criteria = array();
+	public $criteria = [];
 	
 	/**
 	 * @var string
@@ -24,17 +24,17 @@ class EMongoCursor implements Iterator, Countable
 	public $modelClass;
 	
 	/**
-	 * @var EMongoDocument
+	 * @var \Mongo\Document
 	 */
 	public $model;
 	
 	/**
-	 * @var array|MongoCursor|EMongoDocument[]
+	 * @var array|MongoCursor|\Mongo\Document[]
 	 */
-	private $cursor = array();
+	private $cursor = [];
 	
 	/**
-	 * @var EMongoDocument
+	 * @var \Mongo\Document
 	 */
 	private $current;
 
@@ -50,15 +50,15 @@ class EMongoCursor implements Iterator, Countable
 	
 	private $fromCache = false;
 	
-	private $cachedArray = array();
+	private $cachedArray = [];
 
 	/**
 	 * The cursor constructor
-	 * @param string|EMongoDocument $modelClass - The class name for the active record
-	 * @param array|MongoCursor|EMongoCriteria $criteria -  Either a condition array (without sort,limit and skip) or a MongoCursor Object
+	 * @param string|\Mongo\Document $modelClass - The class name for the active record
+	 * @param array|MongoCursor|\Mongo\Criteria $criteria -  Either a condition array (without sort,limit and skip) or a MongoCursor Object
 	 * @param array $fields
 	 */
-	public function __construct($modelClass, $criteria = array(), $fields = array())
+	public function __construct($modelClass, $criteria = [], $fields = [])
 	{
 		// If $fields has something in it
 		if(!empty($fields)){
@@ -67,8 +67,8 @@ class EMongoCursor implements Iterator, Countable
 
 		if(is_string($modelClass)){
 			$this->modelClass = $modelClass;
-			$this->model = EMongoDocument::model($this->modelClass);
-		}elseif($modelClass instanceof EMongoDocument){
+			$this->model = \Mongo\Document::model($this->modelClass);
+		}elseif($modelClass instanceof \Mongo\Document){
 			$this->modelClass = get_class($modelClass);
 			$this->model = $modelClass;
 		}
@@ -76,7 +76,7 @@ class EMongoCursor implements Iterator, Countable
 		if($criteria instanceof MongoCursor){
 			$this->cursor = $criteria;
 			$this->cursor->reset();
-		}elseif($criteria instanceof EMongoCriteria){
+		}elseif($criteria instanceof \Mongo\Criteria){
 			$this->criteria = $criteria;
 			$this->cursor = $this->model->getCollection()->find($criteria->condition, $criteria->project)->sort($criteria->sort);
 			if($criteria->skip > 0){
@@ -99,14 +99,14 @@ class EMongoCursor implements Iterator, Countable
 	 * @param string $method
 	 * @param array $params
 	 * @return mixed
-	 * @throws EMongoException
+	 * @throws \Mongo\Exception
 	 */
-	public function __call($method, $params = array())
+	public function __call($method, $params = [])
 	{
 		if($this->cursor() instanceof MongoCursor && method_exists($this->cursor(), $method)){
-			return call_user_func_array(array($this->cursor(), $method), $params);
+			return call_user_func_array([$this->cursor(), $method], $params);
 		}
-		throw new EMongoException(Yii::t('yii', 'Call to undefined function {method} on the cursor', array('{method}' => $method)));
+		throw new \Mongo\Exception(Yii::t('yii', 'Call to undefined function {method} on the cursor', ['{method}' => $method]));
 	}
 
 	/**
@@ -120,7 +120,7 @@ class EMongoCursor implements Iterator, Countable
 
 	/**
 	 * Get next doc in cursor
-	 * @return EMongoDocument|null
+	 * @return \Mongo\Document|null
 	 */
 	public function getNext()
 	{
@@ -138,8 +138,8 @@ class EMongoCursor implements Iterator, Countable
 
 	/**
 	 * Gets the active record for the current row
-	 * @return EMongoDocument|mixed
-	 * @throws EMongoException
+	 * @return \Mongo\Document|mixed
+	 * @throws \Mongo\Exception
 	 */
 	public function current()
 	{
@@ -156,16 +156,16 @@ class EMongoCursor implements Iterator, Countable
 				$cacheKey =
 				'yii:dbquery' . $this->model->getDbConnection()->server . ':' . $this->model->getDbConnection()->db
 				. ':' . $this->model->getDbConnection()->getSerialisedQuery(
-					is_array($info['query']) && isset($info['query']['$query']) ? $info['query']['$query'] : array(), 
+					is_array($info['query']) && isset($info['query']['$query']) ? $info['query']['$query'] : [],
 					$info['fields'], 
-					is_array($info['query']) && isset($info['query']['$orderby']) ? $info['query']['$orderby'] : array(), 
+					is_array($info['query']) && isset($info['query']['$orderby']) ? $info['query']['$orderby'] : [],
 					$info['skip'], 
 					$info['limit']
 				)
 				. ':' . $this->model->getCollection();
 
 				if(($result = $cache->get($cacheKey)) !== false){
-					Yii::trace('Query result found in cache', 'extensions.MongoYii.EMongoDocument');
+					Yii::trace('Query result found in cache', 'extensions.MongoYii.\Mongo\Document');
 					$this->cachedArray = $result;
 					$this->fromCache = true;
 				}else{
@@ -187,7 +187,7 @@ class EMongoCursor implements Iterator, Countable
 		}
 		
 		if($this->model === null){
-			throw new EMongoException(Yii::t('yii', 'The MongoCursor must have a model'));
+			throw new \Mongo\Exception(Yii::t('yii', 'The MongoCursor must have a model'));
 		}
 		if($this->fromCache){
 			return $this->current = $this->model->populateRecord(current($this->cachedArray), true, $this->partial);
@@ -214,7 +214,7 @@ class EMongoCursor implements Iterator, Countable
 	/**
 	 * Set SlaveOkay
 	 * @param bool $val
-	 * @return EMongoCursor
+	 * @return \Mongo\Cursor
 	 */
 	public function slaveOkay($val = true)
 	{
@@ -225,7 +225,7 @@ class EMongoCursor implements Iterator, Countable
 	/**
 	 * Set sort fields
 	 * @param array $fields
-	 * @return EMongoCursor
+	 * @return \Mongo\Cursor
 	 */
 	public function sort(array $fields)
 	{
@@ -236,7 +236,7 @@ class EMongoCursor implements Iterator, Countable
 	/**
 	 * Set skip
 	 * @param int $num
-	 * @return EMongoCursor
+	 * @return \Mongo\Cursor
 	 */
 	public function skip($num = 0)
 	{
@@ -247,7 +247,7 @@ class EMongoCursor implements Iterator, Countable
 	/**
 	 * Set limit
 	 * @param int $num
-	 * @return EMongoCursor
+	 * @return \Mongo\Cursor
 	 */
 	public function limit($num = 0)
 	{
@@ -263,7 +263,7 @@ class EMongoCursor implements Iterator, Countable
 
 	/**
 	 * Reset the MongoCursor to the beginning
-	 * @return EMongoCursor
+	 * @return \Mongo\Cursor
 	 */
 	public function rewind()
 	{

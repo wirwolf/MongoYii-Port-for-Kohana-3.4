@@ -1,12 +1,12 @@
 <?php
-
+namespace Mongo;
 /**
  * The MongoYii representation of a helper for uploading files to GridFS.
  *
  * It can accept an input file from $_FILES via ::populate and can also do find() and findOne() on the files collection.
  * This file is specifically designed for uploading files from a form to GridFS and is merely a helper, IT IS IN NO WAY REQUIRED.
  */
-class EMongoFile extends EMongoDocument
+class File extends \Mongo\Document
 {
 	/**
 	 * Our file object, can be either the MongoGridFSFile or CUploadFile
@@ -78,6 +78,7 @@ class EMongoFile extends EMongoDocument
 
 	/**
 	 * Sets the file object
+	 * @param $v
 	 */
 	public function setFile($v)
 	{
@@ -96,7 +97,7 @@ class EMongoFile extends EMongoDocument
 	/**
 	 * Returns the static model of the specified AR class.
 	 * @param string $className
-	 * @return EMongoDocument - User the static model class
+	 * @return \Mongo\Document - User the static model class
 	 */
 	public static function model($className = __CLASS__)
 	{
@@ -105,12 +106,15 @@ class EMongoFile extends EMongoDocument
 
 	/**
 	 * Magic will either call a function on the file if it exists or bubble to parent
-	 * @see EMongoDocument::__call()
+	 * @see \Mongo\Document::__call()
+	 * @param string $name
+	 * @param array $parameters
+	 * @return mixed|Document
 	 */
 	public function __call($name, $parameters)
 	{
 		if($this->getFile() instanceof MongoGridFSFile && method_exists($this->getFile(), $name)){
-			return call_user_func_array(array($this->getFile(), $name), $parameters);
+			return call_user_func_array([$this->getFile(), $name], $parameters);
 		}
 		return parent::__call($name, $parameters);
 	}
@@ -119,12 +123,12 @@ class EMongoFile extends EMongoDocument
 	 * This can populate from a $_FILES instance
 	 * @param CModel $model
 	 * @param string $attribute
-	 * @return boolean|EMongoFile|null
+	 * @return boolean|\Mongo\File|null
 	 */
 	public static function populate($model, $attribute)
 	{
 		if($file = CUploadedFile::getInstance($model, $attribute)){
-			$model=new EMongoFile();
+			$model=new \Mongo\File();
 			$model->setFile($file);
 			return $model;
 		}
@@ -136,7 +140,7 @@ class EMongoFile extends EMongoDocument
 	 *
 	 * You must unlink the tempfile yourself by calling unlink($file->getFilename())
 	 * @param string $stream
-	 * @return EMongoFile the new file generated from the stream
+	 * @return \Mongo\File the new file generated from the stream
 
 	 public static function stream($stream){
 		$tempFile = tempnam(null, 'tmp'); // returns a temporary filename
@@ -149,7 +153,7 @@ class EMongoFile extends EMongoDocument
 		fclose($putData);
 		fclose($fp);
 
-		$file = new EMongoFile();
+		$file = new \Mongo\File();
 		$file->setFile($tempFile);
 		return $file;
 		}
@@ -158,11 +162,11 @@ class EMongoFile extends EMongoDocument
 	/**
 	 * Replaces the normal populateRecord specfically for GridFS by setting the attributes from the
 	 * MongoGridFsFile object correctly and other file details like size and name.
-	 * @see EMongoDocument::populateRecord()
+	 * @see \Mongo\Document::populateRecord()
 	 * @param array $attributes
 	 * @param bool $callAfterFind
 	 * @param bool $partial
-	 * @return EMongoDocument|null
+	 * @return \Mongo\Document|null
 	 */
 	public function populateRecord($attributes, $callAfterFind = true, $partial = false)
 	{
@@ -180,7 +184,7 @@ class EMongoFile extends EMongoDocument
 		$record->setIsNewRecord(false);
 		$record->init();
 
-		$labels = array();
+		$labels = [];
 		foreach($attributes as $name => $value){
 			$labels[$name] = 1;
 			$record->$name = $value;
@@ -202,15 +206,15 @@ class EMongoFile extends EMongoDocument
 	 * Inserts the file.
 	 *
 	 * The only difference between the normal insert is that this uses the storeFile function on the GridFS object
-	 * @see EMongoDocument::insert()
+	 * @see \Mongo\Document::insert()
 	 * @param array $attributes
 	 * @return bool
-	 * @throws EMongoException
+	 * @throws \Mongo\Exception
 	 */
 	public function insert($attributes = null)
 	{
 		if(!$this->getIsNewRecord()){
-			throw new EMongoException(Yii::t('yii','The active record cannot be inserted to database because it is not new.'));
+			throw new \Mongo\Exception(Yii::t('yii','The active record cannot be inserted to database because it is not new.'));
 		}
 		if(!$this->beforeSave()){
 			return false;
@@ -226,10 +230,10 @@ class EMongoFile extends EMongoDocument
 		if(YII_DEBUG){
 			// we're actually physically testing for Yii debug mode here to stop us from
 			// having to do the serialisation on the update doc normally.
-			Yii::trace('Executing storeFile: {$document:' . json_encode($document) . '}', 'extensions.MongoYii.EMongoDocument');
+			Yii::trace('Executing storeFile: {$document:' . json_encode($document) . '}', 'extensions.MongoYii.\Mongo\Document');
 		}
 		if($this->getDbConnection()->enableProfiling){
-			$this->profile('extensions.MongoYii.EMongoFile.insert({$document:' . json_encode($document) . '})', 'extensions.MongoYii.EMongoFile.insert');
+			$this->profile('extensions.MongoYii.\Mongo\File.insert({$document:' . json_encode($document) . '})', 'extensions.MongoYii.\Mongo\File.insert');
 		}
 
 		if($_id = $this->getCollection()->storeFile($this->getFilename(), $document)){ // The key change
@@ -244,7 +248,7 @@ class EMongoFile extends EMongoDocument
 
 	/**
 	 * Get collection will now return the GridFS object from the driver
-	 * @see EMongoDocument::getCollection()
+	 * @see \Mongo\Document::getCollection()
 	 */
 	public function getCollection()
 	{
@@ -257,6 +261,6 @@ class EMongoFile extends EMongoDocument
 	 */
 	public function trace($func)
 	{
-		Yii::trace(get_class($this) . '.' . $func.'()', 'extensions.MongoYii.EMongoFile');
+		Yii::trace(get_class($this) . '.' . $func.'()', 'extensions.MongoYii.\Mongo\File');
 	}
 }

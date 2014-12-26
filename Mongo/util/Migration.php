@@ -1,5 +1,5 @@
 <?php
-
+namespace Mongo\util;
 /**
  * EMongoMigration is designed to be used together with the "yiic migratemongo" command.
  *
@@ -33,7 +33,7 @@ abstract class EMongoMigration extends CComponent
 	 * @param string $name The name of the collection.
 	 * @param array $options Options (name=>value) for the operation. See {@link MongoDB::createCollection} for more details.
 	 */
-	public function createCollection($name, $options = array())
+	public function createCollection($name, $options = [])
 	{
 		echo "    > creating collection $name ...";
 		$time = microtime(true);
@@ -122,7 +122,7 @@ abstract class EMongoMigration extends CComponent
 	 * @param array $options
 	 * Options (name=>value) for the save operation. See {@link MongoCollection::ensureIndex} for more details.
 	 */
-	public function ensureIndex($keys, $options = array())
+	public function ensureIndex($keys, $options = [])
 	{
 		echo "    > creating index for fields " . $this->indexList ( $keys ) . " ...";
 		$time = microtime(true);
@@ -136,17 +136,17 @@ abstract class EMongoMigration extends CComponent
 	 * @param mixed $code @link MongoCode or string to execute.
 	 * @param array $args Arguments to be passed to code.
 	 */
-	public function execute($code, $args = array())
+	public function execute($code, $args = [])
 	{
 		echo "    > execute command: $code ...";
 		$time = microtime(true);
 		$this->getDbConnection()->getDB()->execute($code, $args);
 		echo " done (time: " . sprintf('%.3f', microtime(true) - $time) . "s)\n";
 	}
-	
+
 	/**
-	 *
 	 * @return string The current selected collection
+	 * @throws CException
 	 */
 	public function getCollectionName()
 	{
@@ -198,7 +198,7 @@ abstract class EMongoMigration extends CComponent
 	 * @param mixed $a An array or object. If an object is used, it may not have protected or private properties.
 	 * @param array $options Options (name=>value) for the insert operation. See {@link MongoCollection::insert} for more details.
 	 */
-	public function insert($a, $options = array())
+	public function insert($a, $options = [])
 	{
 		echo "    > insert document ...";
 		$time = microtime(true);
@@ -212,7 +212,7 @@ abstract class EMongoMigration extends CComponent
 	 * @param array $criteria Description of records to remove.
 	 * @param array $options Options (name=>value) for the remove operation. See {@link MongoCollection::remove} for more details.
 	 */
-	public function remove($criteria, $options = array())
+	public function remove($criteria, $options = [])
 	{
 		echo "    > remove document ...";
 		$time = microtime(true);
@@ -226,7 +226,7 @@ abstract class EMongoMigration extends CComponent
 	 * @param mixed $a Array or object to save. If an object is used, it may not have protected or private properties.
 	 * @param array $options Options (name=>value) for the save operation. See {@link MongoCollection::save} for more details.
 	 */
-	public function save($a, $options = array())
+	public function save($a, $options = [])
 	{
 		echo "    > save document ...";
 		$time = microtime(true);
@@ -254,14 +254,15 @@ abstract class EMongoMigration extends CComponent
 	public function up()
 	{
 	}
-	
+
 	/**
 	 * Updates a document within the current collection.
-	 * 
 	 * @param array $criteria Description of the objects to update.
-	 * @param array $options Options (name=>value) for the update operation. See {@link MongoCollection::update} for more details.
+	 * @param $new_object
+	 * @param array $options  Options (name=>value) for the update operation. See {@link MongoCollection::update} for more details.
+	 * @throws CException
 	 */
-	public function update($criteria, $new_object, $options = array())
+	public function update($criteria, $new_object, $options = [])
 	{
 		echo "    > update document ...";
 		$time = microtime(true);

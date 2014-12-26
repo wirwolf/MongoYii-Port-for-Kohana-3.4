@@ -1,4 +1,5 @@
 <?php
+namespace Mongo\util;
 /**
  * CDbMessageSource class file.
  *
@@ -104,7 +105,7 @@ class EMongoMessageSource extends CMessageSource
 					Yii::t(
 						'yii', 
 						'EMongoCache.connectionID "{id}" is invalid. Please make sure it refers to the ID of a EMongoClient application component.',
-						array('{id}' => $id)
+						['{id}' => $id]
 					)
 				);
 			}
@@ -133,11 +134,11 @@ class EMongoMessageSource extends CMessageSource
 	 */
 	protected function loadMessagesFromDb($category,$language)
 	{
-		$criteria = array('category' => $category, "translations.language" => $language);
-		$fields = array('message' => true, 'translations.message' => true);
+		$criteria = ['category' => $category, "translations.language" => $language];
+		$fields = ['message' => true, 'translations.message' => true];
 		$messages = $this->getCollection()->find($criteria, $fields);
 		 
-		$result = array();
+		$result = [];
 		foreach($messages as $message){
 			$result[$message['message']] = $message['translations'][0]['message'];
 		}
