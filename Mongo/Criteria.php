@@ -11,7 +11,7 @@ namespace Mongo;
  * @property int $limit
  * @property array $project
  */
-class Criteria extends CComponent
+class Criteria/* extends CComponent*/
 {
 	/**
 	 * @var array
@@ -87,7 +87,7 @@ class Criteria extends CComponent
 			}
 		}
 		
-		$this->_sort = CMap::mergeArray($sort, $this->_sort);
+		//$this->_sort = CMap::mergeArray($sort, $this->_sort);
 		return $this;
 	}
 
@@ -230,7 +230,7 @@ class Criteria extends CComponent
 			$value = $matches[2];
 			$op = $matches[1];
 			if($partialMatch === true){
-				$value = new MongoRegex("/$value/i");
+				$value = new \MongoRegex("/$value/i");
 			}else{
 				if(
 					!is_bool($value) && !is_array($value) && preg_match('/^([0-9]|[1-9]{1}\d+)$/' /* Will only match real integers, unsigned */, $value) > 0

@@ -160,7 +160,7 @@ class Client/* extends CApplicationComponent*/
 	public function __call($name, $parameters = [])
 	{
 		if(!method_exists($this->getDB(), $name)){
-			return parent::__call($name, $parameters);
+			//return parent::__call($name, $parameters);
 		}
 		return call_user_func_array([$this->getDB(), $name], $parameters);
 	}
@@ -168,7 +168,7 @@ class Client/* extends CApplicationComponent*/
 	public function __construct()
 	{
 		// We copy this function to add the subdocument validator as a built in validator
-		CValidator::$builtInValidators['subdocument'] = 'ESubdocumentValidator';
+		//CValidator::$builtInValidators['subdocument'] = 'ESubdocumentValidator';
 	}
 	
 	/**
@@ -195,21 +195,21 @@ class Client/* extends CApplicationComponent*/
 	public function connect()
 	{
 		if(!extension_loaded('mongo')){
-			throw new \Mongo\Exception('We could not find the MongoDB extension ( http://php.net/manual/en/mongo.installation.php ), please install it')ж
+			throw new \Mongo\Exception('We could not find the MongoDB extension ( http://php.net/manual/en/mongo.installation.php ), please install it');
 		}
 		
 		// We don't need to throw useless exceptions here, the MongoDB PHP Driver has its own checks and error reporting
 		// Yii will easily and effortlessly display the errors from the PHP driver, we should only catch its exceptions if
 		// we wanna add our own custom messages on top which we don't, the errors are quite self explanatory
 		if(version_compare(phpversion('mongo'), '1.3.0', '<')){
-			$this->_mongo = new Mongo($this->server, $this->options);
+			$this->_mongo = new \Mongo($this->server, $this->options);
 			$this->_mongo->connect();
 			
 			if($this->setSlaveOkay){
 				$this->_mongo->setSlaveOkay($this->setSlaveOkay);
 			}
 		}else{
-			$this->_mongo = new MongoClient($this->server, $this->options);
+			$this->_mongo = new \MongoClient($this->server, $this->options);
 			
 			if(is_array($this->RP)){
 				$const = $this->RP[0];
@@ -228,7 +228,7 @@ class Client/* extends CApplicationComponent*/
 	/**
 	 * Gets the connection object
 	 * Use this to access the Mongo/MongoClient instance within the extension
-	 * @return Mongo MongoClient
+	 * @return \Mongo MongoClient
 	 */
 	public function getConnection()
 	{
@@ -249,7 +249,7 @@ class Client/* extends CApplicationComponent*/
 	
 	/**
 	 * Gets the raw Database
-	 * @return MongoDB
+	 * @return \MongoDB
 	 */
 	public function getDB()
 	{
@@ -303,7 +303,7 @@ class Client/* extends CApplicationComponent*/
 	/**
 	 * A wrapper for the original processing
 	 * @param string $name
-	 * @return MongoCollection
+	 * @return \MongoCollection
 	 */
 	public function selectCollection($name)
 	{
@@ -325,8 +325,8 @@ class Client/* extends CApplicationComponent*/
 		){
 			$_meta = [];
 			
-			$reflect = new ReflectionClass(get_class($o));
-			$class_vars = $reflect->getProperties(ReflectionProperty::IS_PUBLIC); // Pre-defined doc attributes
+			$reflect = new \ReflectionClass(get_class($o));
+			$class_vars = $reflect->getProperties(\ReflectionProperty::IS_PUBLIC); // Pre-defined doc attributes
 			
 			foreach($class_vars as $prop){
 				
@@ -401,7 +401,7 @@ class Client/* extends CApplicationComponent*/
 	 * This function is not actively used it is
 	 * here as a helper for anyone who needs it
 	 * @param int $yourTimestamp
-	 * @return MongoID
+	 * @return \MongoID
 	 */
 	public function createMongoIdFromTimestamp($yourTimestamp)
 	{

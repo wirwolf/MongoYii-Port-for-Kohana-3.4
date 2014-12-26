@@ -5,7 +5,7 @@ namespace Mongo;
  *
  * A data Provider helper for interacting with the \Mongo\Cursor
  */
-class DataProvider extends CActiveDataProvider
+class DataProvider/* extends CActiveDataProvider*/
 {
 	/**
 	 * The primary ActiveRecord class name. The {@link getData()} method
@@ -36,7 +36,7 @@ class DataProvider extends CActiveDataProvider
 	
 	/**
 	 * The internal MongoDB cursor as a MongoCursor instance
-	 * @var \Mongo\Cursor|MongoCursor
+	 * @var \Mongo\Cursor|\MongoCursor
 	 */
 	private $_cursor;
 	

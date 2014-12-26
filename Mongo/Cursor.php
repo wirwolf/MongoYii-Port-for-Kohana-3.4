@@ -11,7 +11,7 @@ namespace Mongo;
  * I did try originally to make this into a active data provider and use this for two fold operations but the cactivedataprovider would extend
  * a lot for the cursor and the two took quite different constructors.
  */
-class Cursor implements Iterator, Countable
+class Cursor implements \Iterator, \Countable
 {
 	/**
 	 * @var array|\Mongo\Criteria
@@ -55,7 +55,7 @@ class Cursor implements Iterator, Countable
 	/**
 	 * The cursor constructor
 	 * @param string|\Mongo\Document $modelClass - The class name for the active record
-	 * @param array|MongoCursor|\Mongo\Criteria $criteria -  Either a condition array (without sort,limit and skip) or a MongoCursor Object
+	 * @param array|\MongoCursor|\Mongo\Criteria $criteria -  Either a condition array (without sort,limit and skip) or a MongoCursor Object
 	 * @param array $fields
 	 */
 	public function __construct($modelClass, $criteria = [], $fields = [])
@@ -73,7 +73,7 @@ class Cursor implements Iterator, Countable
 			$this->model = $modelClass;
 		}
 
-		if($criteria instanceof MongoCursor){
+		if($criteria instanceof \MongoCursor){
 			$this->cursor = $criteria;
 			$this->cursor->reset();
 		}elseif($criteria instanceof \Mongo\Criteria){
@@ -103,15 +103,15 @@ class Cursor implements Iterator, Countable
 	 */
 	public function __call($method, $params = [])
 	{
-		if($this->cursor() instanceof MongoCursor && method_exists($this->cursor(), $method)){
+		if($this->cursor() instanceof \MongoCursor && method_exists($this->cursor(), $method)){
 			return call_user_func_array([$this->cursor(), $method], $params);
 		}
-		throw new \Mongo\Exception(Yii::t('yii', 'Call to undefined function {method} on the cursor', ['{method}' => $method]));
+		throw new \Mongo\Exception('Call to undefined function {method} on the cursor', ['{method}' => $method]);
 	}
 
 	/**
 	 * Holds the MongoCursor
-	 * @return array|MongoCursor
+	 * @return array|\MongoCursor
 	 */
 	public function cursor()
 	{
@@ -187,7 +187,7 @@ class Cursor implements Iterator, Countable
 		}
 		
 		if($this->model === null){
-			throw new \Mongo\Exception(Yii::t('yii', 'The MongoCursor must have a model'));
+			throw new \Mongo\Exception('The MongoCursor must have a model');
 		}
 		if($this->fromCache){
 			return $this->current = $this->model->populateRecord(current($this->cachedArray), true, $this->partial);

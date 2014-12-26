@@ -1,6 +1,6 @@
 <?php
 namespace Mongo;
-class Model extends CModel
+class Model extends \Model
 {
 	/**
 	 * @var \Mongo\Client the default database connection for all active record classes.
@@ -21,7 +21,7 @@ class Model extends CModel
 	 * @see yii/framework/CComponent::__get()
 	 * @param string $name
 	 * @return mixed
-	 * @throws CException
+	 * @throws \Exception
 	 * @throws Exception
 	 * @throws \Exception
 	 */
@@ -38,7 +38,7 @@ class Model extends CModel
 		}
 		try{
 			return parent::__get($name);
-		}catch(CException $e){
+		}catch(\Exception $e){
 			$getter = 'get' . $name;
 			if(method_exists($this, $getter)){
 				throw $e;
@@ -64,7 +64,7 @@ class Model extends CModel
 		// If an attribute can be set first to ensure speed of accessing local variables...hmmm
 		try{
 			return parent::__set($name, $value);
-		}catch(CException $e){
+		}catch(\Exception $e){
 			return $this->setAttribute($name, $value);
 		}
 	}
@@ -155,7 +155,7 @@ class Model extends CModel
 	}
 
 	/**
-	 * @see CModel::attributeNames()
+	 * @see \Model::attributeNames()
 	 * @return array
 	 */
 	public function attributeNames()
@@ -219,7 +219,7 @@ class Model extends CModel
 	}
 
 	/**
-	 * @see CModel::getAttributes()
+	 * @see \Model::getAttributes()
 	 * @param bool $names
 	 * @return array
 	 */
@@ -406,7 +406,7 @@ class Model extends CModel
 		// Find out what the pk is and what kind of condition I should apply to it
 		if(is_array($pk)){
 			//It is an array of references
-			if(MongoDBRef::isRef(reset($pk))){
+			if(\MongoDBRef::isRef(reset($pk))){
 				$result = [];
 				foreach($pk as $singleReference){
 					$row = $this->populateReference($singleReference, $cname);
@@ -421,7 +421,7 @@ class Model extends CModel
 			}
 			// It is an array of _ids
 			$clause = array_merge($where, [$fkey => ['$in' => $pk]]);
-		}elseif($pk instanceof MongoDBRef){
+		}elseif($pk instanceof \MongoDBRef){
 			// I should probably just return it here
 			// otherwise I will continue on
 			return $this->_related[$name] = $this->populateReference($pk, $cname);
@@ -455,7 +455,7 @@ class Model extends CModel
 	 */
 	public function populateReference($reference, $cname = null)
 	{
-		$row = MongoDBRef::get(self::$db->getDB(), $reference);
+		$row = \MongoDBRef::get(self::$db->getDB(), $reference);
 		$o = (is_null($cname)) ? $this : $cname::model();
 		return $o->populateRecord($row);
 	}
@@ -602,7 +602,7 @@ class Model extends CModel
 		if(self::$db instanceof \Mongo\Client){
 			return self::$db;
 		}
-		throw new \Mongo\Exception(Yii::t('yii', 'MongoDB Active Record requires a "mongodb" \Mongo\Client application component.'));
+		throw new \Mongo\Exception(( 'MongoDB Active Record requires a "mongodb" \Mongo\Client application component.'));
 	}
 	
 	/**

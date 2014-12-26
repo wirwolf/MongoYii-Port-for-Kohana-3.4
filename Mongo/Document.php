@@ -191,18 +191,18 @@ class Document extends \Mongo\Model
 	 * As to what version this will become deprecated:- I dunno. It will not be soon since it will be a
 	 * functionality breaker...
 	 *
-	 * @param string|MongoId $value
-	 * @return MongoId
+	 * @param string|\MongoId $value
+	 * @return \MongoId
 	 */
 	public function getMongoId($value = null)
 	{
-		return $value instanceof MongoId ? $value : new MongoId($value);
+		return $value instanceof \MongoId ? $value : new \MongoId($value);
 	}
 
 	/**
 	 * Returns the value of the primary key
-	 * @param string|MongoId $value
-	 * @return MongoId
+	 * @param string|\MongoId $value
+	 * @return \MongoId
 	 */
 	public function getPrimaryKey($value = null)
 	{
@@ -351,7 +351,7 @@ class Document extends \Mongo\Model
 	 * returning the label defined in relational object.
 	 * In particular, if the attribute name is in the form of "post.author.name",
 	 * then this method will derive the label from the "author" relation's "name" attribute.
-	 * @see CModel::generateAttributeLabel()
+	 * @see \Model::generateAttributeLabel()
 	 * @param string $attribute - the attribute name
 	 * @return string - the attribute label
 	 */
@@ -446,7 +446,7 @@ class Document extends \Mongo\Model
 	 */
 	public function onBeforeSave($event)
 	{
-		$this->raiseEvent('onBeforeSave', $event);
+		//$this->raiseEvent('onBeforeSave', $event);
 	}
 
 	/**
@@ -454,7 +454,7 @@ class Document extends \Mongo\Model
 	 */
 	public function onAfterSave($event)
 	{
-		$this->raiseEvent('onAfterSave', $event);
+		//$this->raiseEvent('onAfterSave', $event);
 	}
 
 	/**
@@ -462,7 +462,7 @@ class Document extends \Mongo\Model
 	 */
 	public function onBeforeDelete($event)
 	{
-		$this->raiseEvent('onBeforeDelete', $event);
+		//$this->raiseEvent('onBeforeDelete', $event);
 	}
 
 	/**
@@ -470,7 +470,7 @@ class Document extends \Mongo\Model
 	 */
 	public function onAfterDelete($event)
 	{
-		$this->raiseEvent('onAfterDelete', $event);
+		//$this->raiseEvent('onAfterDelete', $event);
 	}
 
 	/**
@@ -478,7 +478,7 @@ class Document extends \Mongo\Model
 	 */
 	public function onBeforeFind($event)
 	{
-		$this->raiseEvent('onBeforeFind', $event);
+		//$this->raiseEvent('onBeforeFind', $event);
 	}
 
 	/**
@@ -486,7 +486,7 @@ class Document extends \Mongo\Model
 	 */
 	public function onAfterFind($event)
 	{
-		$this->raiseEvent('onAfterFind', $event);
+		//$this->raiseEvent('onAfterFind', $event);
 	}
 
 
@@ -495,19 +495,19 @@ class Document extends \Mongo\Model
 	 */
 	protected function beforeSave()
 	{
-		if($this->hasEventHandler('onBeforeSave')){
-			$event = new CModelEvent($this);
+		/*if($this->hasEventHandler('onBeforeSave')){
+			$event = new \ModelEvent($this);
 			$this->onBeforeSave($event);
 			return $event->isValid;
-		}
+		}*/
 		return true;
 	}
 
 	protected function afterSave()
 	{
-		if($this->hasEventHandler('onAfterSave')){
+		/*if($this->hasEventHandler('onAfterSave')){
 			$this->onAfterSave(new CEvent($this));
-		}
+		}*/
 	}
 
 
@@ -516,34 +516,34 @@ class Document extends \Mongo\Model
 	 */
 	protected function beforeDelete()
 	{
-		if($this->hasEventHandler('onBeforeDelete')){
-			$event = new CModelEvent($this);
+		/*if($this->hasEventHandler('onBeforeDelete')){
+			$event = new \ModelEvent($this);
 			$this->onBeforeDelete($event);
 			return $event->isValid;
-		}
+		}*/
 		return true;
 	}
 
 	protected function afterDelete()
 	{
-		if($this->hasEventHandler('onAfterDelete')){
+		/*if($this->hasEventHandler('onAfterDelete')){
 			$this->onAfterDelete(new CEvent($this));
-		}
+		}*/
 	}
 
 	protected function beforeFind()
 	{
-		if($this->hasEventHandler('onBeforeFind')){
-			$event = new CModelEvent($this);
+		/*if($this->hasEventHandler('onBeforeFind')){
+			$event = new \ModelEvent($this);
 			$this->onBeforeFind($event);
-		}
+		}*/
 	}
 
 	protected function afterFind()
 	{
-		if($this->hasEventHandler('onAfterFind')){
+		/*if($this->hasEventHandler('onAfterFind')){
 			$this->onAfterFind(new CEvent($this));
-		}
+		}*/
 	}
 
 	/**
@@ -556,9 +556,9 @@ class Document extends \Mongo\Model
 	 * @return bool
 	 */
 	public function save($runValidation = true, $attributes = null){
-		if(!$runValidation || $this->validate($attributes)){
+		/*if(!$runValidation || $this->validate($attributes)){
 			return $this->getIsNewRecord() ? $this->insert($attributes) : $this->update($attributes);
-		}
+		}*/
 		return false;
 	}
 
@@ -571,7 +571,7 @@ class Document extends \Mongo\Model
 	public function saveAttributes($attributes)
 	{
 		if($this->getIsNewRecord()){
-			throw new \Mongo\Exception(Yii::t('yii', 'The active record cannot be updated because it is new.'));
+			throw new \Mongo\Exception( 'The active record cannot be updated because it is new.');
 		}
 		
 		$this->trace(__FUNCTION__);
@@ -588,7 +588,7 @@ class Document extends \Mongo\Model
 			}
 		}
 		if(!isset($this->{$this->primaryKey()}) || $this->getPrimaryKey() === null){
-			throw new \Mongo\Exception(Yii::t('yii', 'The active record cannot be updated because its _id is not set!'));
+			throw new \Mongo\Exception('The active record cannot be updated because its _id is not set!');
 		}
 		return $this->lastError = $this->updateByPk($this->getPrimaryKey(), ['$set' => $values]);
 	}
@@ -602,7 +602,7 @@ class Document extends \Mongo\Model
 	public function insert($attributes = null)
 	{
 		if(!$this->getIsNewRecord()){
-			throw new \Mongo\Exception(Yii::t('yii', 'The active record cannot be inserted to database because it is not new.'));
+			throw new \Mongo\Exception('The active record cannot be inserted to database because it is not new.');
 		}
 		if(!$this->beforeSave()){
 			return false;
@@ -659,14 +659,14 @@ class Document extends \Mongo\Model
 	public function update($attributes = null)
 	{
 		if($this->getIsNewRecord()){
-			throw new \Mongo\Exception(Yii::t('yii', 'The active record cannot be updated because it is new.'));
+			throw new \Mongo\Exception( 'The active record cannot be updated because it is new.');
 		}
 		if(!$this->beforeSave()){
 			return false;
 		}
 		$this->trace(__FUNCTION__);
 		if($this->getPrimaryKey() === null){ // An _id is required
-			throw new \Mongo\Exception(Yii::t('yii', 'The active record cannot be updated because it has primary key set.'));
+			throw new \Mongo\Exception( 'The active record cannot be updated because it has primary key set.');
 		}
 
 		$partial = false;
@@ -726,7 +726,7 @@ class Document extends \Mongo\Model
 	public function delete()
 	{
 		if($this->getIsNewRecord()){
-			throw new \Mongo\Exception(Yii::t('yii', 'The active record cannot be deleted because it is new.'));
+			throw new \Mongo\Exception( 'The active record cannot be deleted because it is new.');
 		}
 		$this->trace(__FUNCTION__);
 		if(!$this->beforeDelete()){
@@ -877,11 +877,11 @@ class Document extends \Mongo\Model
 	 */
 	public function findAllByPk($pk, $fields = [])
 	{
-		if(is_string($pk) || $pk instanceof MongoId){
+		if(is_string($pk) || $pk instanceof \MongoId){
 			return $this->find([$this->primaryKey() => $this->getPrimaryKey($pk)], $fields);
 		}
 		if(!is_array($pk)){
-			throw new \Mongo\Exception(Yii::t('yii', 'Set an incorrect primary key.'));
+			throw new \Mongo\Exception( 'Set an incorrect primary key.');
 		}
 		foreach($pk as $key => $value){
 			$pk[$key] = $this->getPrimaryKey($value);
@@ -953,7 +953,7 @@ class Document extends \Mongo\Model
 
 	/**
 	 * Finds one by _id
-	 * @param string|MongoId $_id
+	 * @param string|\MongoId $_id
 	 * @param array|string[] $fields
 	 * @return \Mongo\Document|null
 	 */
@@ -966,7 +966,7 @@ class Document extends \Mongo\Model
 
 	/**
 	 * An alias for findBy_id() that relates to Yiis own findByPk
-	 * @param string|MongoId $pk
+	 * @param string|\MongoId $pk
 	 * @param array|string[] $fields
 	 * @return \Mongo\Document|null
 	 */
@@ -978,7 +978,7 @@ class Document extends \Mongo\Model
 
 	/**
 	 * Delete record by pk
-	 * @param string|MongoId $pk
+	 * @param string|\MongoId $pk
 	 * @param array|\Mongo\Criteria $criteria
 	 * @param array $options
 	 * @return mixed
@@ -1014,7 +1014,7 @@ class Document extends \Mongo\Model
 
 	/**
 	 * Update record by PK
-	 * @param string|MongoId $pk
+	 * @param string|\MongoId $pk
 	 * @param array $updateDoc
 	 * @param array|\Mongo\Criteria $criteria
 	 * @param array $options
@@ -1150,7 +1150,7 @@ class Document extends \Mongo\Model
 		$this->trace(__FUNCTION__);
 
 		if($this->getIsNewRecord()){
-			throw new \Mongo\Exception(Yii::t('yii', 'The active record cannot be updated because it is new.'));
+			throw new \Mongo\Exception( 'The active record cannot be updated because it is new.');
 		}
 		if(sizeof($counters) > 0){
 			foreach($counters as $key => $value){
@@ -1214,7 +1214,7 @@ class Document extends \Mongo\Model
 					$value = $matches[2];
 					$op = $matches[1];
 					if($partialMatch === true){
-						$value = new MongoRegex("/$value/i");
+						$value = new \MongoRegex("/$value/i");
 					}else{
 						if(
 							!is_bool($value) && !is_array($value) && preg_match('/^([0-9]|[1-9]{1}\d+)$/' /* Will only match real integers, unsigned */, $value) > 0
@@ -1279,7 +1279,7 @@ class Document extends \Mongo\Model
 		$this->trace(__FUNCTION__);
 		$c = $this->getDbCriteria();
 		if(is_array($c) && isset($c['condition']) && !empty($c['condition'])){
-			$query = CMap::mergeArray($query, $c['condition']);
+			//$query = CMap::mergeArray($query, $c['condition']);
 		}
 
 		return Yii::app()->mongodb->command([
@@ -1291,9 +1291,9 @@ class Document extends \Mongo\Model
 
 	/**
 	 * A mapreduce helper for this model
-	 * @param MongoCode $map
-	 * @param MongoCode $reduce
-	 * @param MongoCode $finalize
+	 * @param \MongoCode $map
+	 * @param \MongoCode $reduce
+	 * @param \MongoCode $finalize
 	 * @param array $out
 	 * @param array $query
 	 * @param array $options // All other options for input to the command
@@ -1427,7 +1427,7 @@ class Document extends \Mongo\Model
 
 	/**
 	 * Gets the collection for this model
-	 * @return MongoCollection
+	 * @return \MongoCollection
 	 */
 	public function getCollection()
 	{
@@ -1442,7 +1442,7 @@ class Document extends \Mongo\Model
 	 */
 	public function mergeCriteria($oldCriteria, $newCriteria)
 	{
-		return CMap::mergeArray($oldCriteria, $newCriteria);
+		//return CMap::mergeArray($oldCriteria, $newCriteria);
 	}
 
 	/**
@@ -1451,6 +1451,6 @@ class Document extends \Mongo\Model
 	 */
 	public function trace($func)
 	{
-		Yii::trace(get_class($this) . '.' . $func . '()', 'extensions.MongoYii.\Mongo\Document');
+		//Yii::trace(get_class($this) . '.' . $func . '()', 'extensions.MongoYii.\Mongo\Document');
 	}
 }

@@ -10,7 +10,7 @@ namespace Mongo;
 /**
  * This is only ever used in conjunction with CGridView and CListView. It is not designed to be used independantly
  */
-class Sort extends CSort
+class Sort/* extends CSort*/
 {
 	/**
 	 * @see CSort::resolveAttribute()
@@ -22,10 +22,10 @@ class Sort extends CSort
 		if($this->attributes !== []){
 			$attributes = $this->attributes;
 		}elseif($this->modelClass !== null){
-			$attributes = EmongoDocument::model($this->modelClass)->attributeNames();
+			$attributes = \Mongo\Document::model($this->modelClass)->attributeNames();
 			if(empty($attributes)){
 				// The previous statement can return null in certain models. So this is used as backup.
-				$attributes = EmongoDocument::model($this->modelClass)->safeAttributeNames;
+				$attributes = \Mongo\Document::model($this->modelClass)->safeAttributeNames;
 			}
 		}else{
 			return false;
@@ -36,7 +36,7 @@ class Sort extends CSort
 					return $definition;
 				}
 			}elseif($definition === '*'){
-				if($this->modelClass !== null && EmongoDocument::model($this->modelClass)->hasAttribute($attribute)){
+				if($this->modelClass !== null && \Mongo\Document::model($this->modelClass)->hasAttribute($attribute)){
 					return $attribute;
 				}
 			}elseif($definition === $attribute){
@@ -62,7 +62,7 @@ class Sort extends CSort
 			$attribute = $definition;
 		}
 		if($this->modelClass !== null){
-			return EmongoDocument::model($this->modelClass)->getAttributeLabel($attribute);
+			return \Mongo\Document::model($this->modelClass)->getAttributeLabel($attribute);
 		}
 		return $attribute;
 	}

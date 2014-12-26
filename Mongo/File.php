@@ -20,7 +20,7 @@ class File extends \Mongo\Document
 	 */
 	public function getFilename()
 	{
-		if($this->getFile() instanceof MongoGridFSFile){
+		if($this->getFile() instanceof \MongoGridFSFile){
 			return $this->getFile()->getFilename();
 		}
 		if($this->getFile() instanceof CUploadedFile){
@@ -38,7 +38,7 @@ class File extends \Mongo\Document
 	 */
 	public function getSize()
 	{
-		if($this->getFile() instanceof MongoGridFSFile || $this->getFile() instanceof CUploadedFile){
+		if($this->getFile() instanceof \MongoGridFSFile || $this->getFile() instanceof CUploadedFile){
 			return $this->getFile()->getSize();
 		}
 		if(is_file($this->getFile())){
@@ -53,7 +53,7 @@ class File extends \Mongo\Document
 	 */
 	public function getBytes()
 	{
-		if($this->getFile() instanceof MongoGridFSFile){
+		if($this->getFile() instanceof \MongoGridFSFile){
 			return $this->getFile()->getBytes();
 		}
 		if($this->getFile() instanceof CUploadedFile || (is_file($this->getFile()) && is_readable($this->getFile()))){
@@ -70,7 +70,7 @@ class File extends \Mongo\Document
 		// This if statement allows for you to continue using this class AFTER insert
 		// basically it will only get the file if you plan on using it further which means that
 		// otherwise it omits at least one database call each time
-		if($this->_id instanceof MongoId && !$this->_file instanceof MongoGridFSFile){
+		if($this->_id instanceof MongoId && !$this->_file instanceof \MongoGridFSFile){
 			return $this->_file = $this->getCollection()->get($this->_id);
 		}
 		return $this->_file;
@@ -113,7 +113,7 @@ class File extends \Mongo\Document
 	 */
 	public function __call($name, $parameters)
 	{
-		if($this->getFile() instanceof MongoGridFSFile && method_exists($this->getFile(), $name)){
+		if($this->getFile() instanceof \MongoGridFSFile && method_exists($this->getFile(), $name)){
 			return call_user_func_array([$this->getFile(), $name], $parameters);
 		}
 		return parent::__call($name, $parameters);
@@ -121,7 +121,7 @@ class File extends \Mongo\Document
 
 	/**
 	 * This can populate from a $_FILES instance
-	 * @param CModel $model
+	 * @param \Model $model
 	 * @param string $attribute
 	 * @return boolean|\Mongo\File|null
 	 */
@@ -161,7 +161,7 @@ class File extends \Mongo\Document
 
 	/**
 	 * Replaces the normal populateRecord specfically for GridFS by setting the attributes from the
-	 * MongoGridFsFile object correctly and other file details like size and name.
+	 * \MongoGridFSFile object correctly and other file details like size and name.
 	 * @see \Mongo\Document::populateRecord()
 	 * @param array $attributes
 	 * @param bool $callAfterFind
@@ -173,7 +173,7 @@ class File extends \Mongo\Document
 		if($attributes === false){
 			return null;
 		}
-		// the cursor will actually input a MongoGridFSFile object as the "document"
+		// the cursor will actually input a \MongoGridFSFile object as the "document"
 		// so what we wanna do is get the attributes or metadata attached to the file object
 		// set it as our attributes and then set this classes file as the first param we got
 		$file = $attributes;
@@ -214,7 +214,7 @@ class File extends \Mongo\Document
 	public function insert($attributes = null)
 	{
 		if(!$this->getIsNewRecord()){
-			throw new \Mongo\Exception(Yii::t('yii','The active record cannot be inserted to database because it is not new.'));
+			throw new \Mongo\Exception(('The active record cannot be inserted to database because it is not new.'));
 		}
 		if(!$this->beforeSave()){
 			return false;
@@ -261,6 +261,6 @@ class File extends \Mongo\Document
 	 */
 	public function trace($func)
 	{
-		Yii::trace(get_class($this) . '.' . $func.'()', 'extensions.MongoYii.\Mongo\File');
+		//Yii::trace(get_class($this) . '.' . $func.'()', 'extensions.MongoYii.\Mongo\File');
 	}
 }

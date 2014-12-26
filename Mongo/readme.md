@@ -173,7 +173,7 @@ The `\Mongo\Model` is a stripped down version of the `\Mongo\Document`.
 
 This was made separate from `\Mongo\Document` to provide a small and slim active model for use on subdocuments. Whenever you make a class based subdocument you can extend this class.
 
-The `\Mongo\Model` implements all that `CModel` does but with a few added and changed features.
+The `\Mongo\Model` implements all that `\Model` does but with a few added and changed features.
 
 ### Magic functions
 
