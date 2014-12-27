@@ -12,6 +12,7 @@
  */
 class MongoDBSystem {
 
+	private $debug = false;
 	/**
 	 * @var MongoDBSystem
 	 */
@@ -31,11 +32,13 @@ class MongoDBSystem {
 		return self::$localObj;
 	}
 
+
 	public function connect()
 	{
 		$db = new \Mongo\Client();
 		$db->server = 'mongodb://localhost:27017';
 		$db->db = 'OGame';
+		$db->enableProfiling = true;
 		$db->connect();
 		$username = 'ogame';
 		$password = 'ogame';
@@ -62,5 +65,46 @@ class MongoDBSystem {
 	public function getMongoComponent()
 	{
 		return $this->mongoConnect;
+	}
+
+	public function __construct()
+	{
+		if(class_exists('\\DebugBar', true))
+		{
+			\DebugBar::instance()->addCollector(new DebugBar\DataCollector\MessagesCollector('MongoDB'));
+		}
+	}
+	/**********************Debug Functions***************************************************************************/
+	public static function trace($text,$key)
+	{
+		\DebugBar::instance()->MongoDB->addMessage($text,$key);
+	}
+
+
+	public static function beginProfile($data, $key)
+	{
+		\DebugBar::instance()->time->startMeasure($data, $key);
+	}
+
+	public static function endProfile($data, $key)
+	{
+		\DebugBar::instance()->time->stopMeasure($data, $key);
+	}
+
+
+	/**
+	 * @return boolean
+	 */
+	public function isDebug()
+	{
+		return $this->debug;
+	}
+
+	/**
+	 * @param boolean $debug
+	 */
+	public function setDebug($debug)
+	{
+		$this->debug = $debug;
 	}
 }
