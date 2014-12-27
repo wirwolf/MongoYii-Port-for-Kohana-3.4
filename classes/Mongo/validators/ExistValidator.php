@@ -16,7 +16,7 @@ namespace Mongo\validators;
  *
  * @see CExistValidator
  */
-class EMongoExistValidator extends CValidator
+class ExistValidator extends \Validator\Validator
 {
 	/**
 	 * @var boolean whether the comparison is case sensitive. Defaults to true.
@@ -72,11 +72,11 @@ class EMongoExistValidator extends CValidator
 
 		$className = $this->className === null ? get_class($object) : Yii::import($this->className);
 		$attributeName = $this->attributeName === null ? $attribute : $this->attributeName;
-		$finder = EMongoDocument::model($className);
+		$finder = \Mongo\Document::model($className);
 
-		$criteria = [$attributeName => $this->mongoId ? new MongoId($value) : $value];
+		$criteria = [$attributeName => $this->mongoId ? new \MongoId($value) : $value];
 		if(!$finder->exists($criteria)){
-			$message = $this->message !== null ? $this->message : Yii::t('yii', '{attribute} "{value}" is invalid.');
+			$message = $this->message !== null ? $this->message : '{attribute} "{'.$value.'}" is invalid.';
 			$this->addError($object, $attribute, $message, ['{value}' => CHtml::encode($value)]);
 		}
 	}

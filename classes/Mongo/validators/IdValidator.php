@@ -7,7 +7,7 @@ namespace Mongo\validators;
  * This was created because at the time it was seen as the most flexible, yet easiest way, to accomplish
  * the casting of MongoIds automatically.
  */
-class EMongoIdValidator extends CValidator
+class MongoIdValidator extends \Validator\Validator
 {
 	public $allowEmpty = true;
 
@@ -20,11 +20,11 @@ class EMongoIdValidator extends CValidator
 		
 		if(is_array($value)){
 			foreach($value as $key=>$attr){
-				$value[$key] = $attr instanceof MongoId ? $attr : new MongoId($attr);
+				$value[$key] = $attr instanceof \MongoId ? $attr : new \MongoId($attr);
 			}
 			$object->$attribute = $value;
 		}else{
-			$object->$attribute = $object->$attribute instanceof MongoId ? $object->$attribute : new MongoId($object->$attribute);
+			$object->$attribute = $object->$attribute instanceof \MongoId ? $object->$attribute : new \MongoId($object->$attribute);
 		}
 	}
 }

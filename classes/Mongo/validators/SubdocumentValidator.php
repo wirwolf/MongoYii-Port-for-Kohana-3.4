@@ -6,7 +6,7 @@ namespace Mongo\validators;
  * Warning: This class, if abused, can cause heavy repitition within your application.
  * With great power comes great responsibility.
  */
-class ESubdocumentValidator extends CValidator
+class SubdocumentValidator extends \Validator\Validator
 {
 	public $class;
 
@@ -23,10 +23,10 @@ class ESubdocumentValidator extends CValidator
 	public function validateAttribute($object, $attribute)
 	{
 		if(!$this->type){
-			throw new EMongoException(Yii::t('yii', 'You must supply a subdocument type of either "many" or "one" in order to validate subdocuments'));
+			throw new \Mongo\Exception('You must supply a subdocument type of either "many" or "one" in order to validate subdocuments');
 		}
 		if(!$this->class && !$this->rules){
-			throw new EMongoException(Yii::t('yii', 'You must supply either some rules to validate by or a class name to use'));
+			throw new \Mongo\Exception('You must supply either some rules to validate by or a class name to use');
 		}
 		// Lets judge what class we are using
 		// If we are using a pre-defined class then lets just get on with it otherwise
@@ -34,23 +34,19 @@ class ESubdocumentValidator extends CValidator
 		if($this->class){
 			$c = new $this->class;
 		}else{
-			$c = new EMongoModel();
+			$c = new \Mongo\Model();
 			foreach($this->rules as $rule){
 				if(isset($rule[0], $rule[1])){ // attributes, validator name
-					$c->validatorList->add(CValidator::createValidator($rule[1],$this,$rule[0],array_slice($rule,2)));
+					$c->validatorList->add(\Validator\Validator::createValidator($rule[1],$this,$rule[0],array_slice($rule,2)));
 				}else{
-					throw new CException(
-						Yii::t(
-							'yii', 
-							'{class} has an invalid validation rule. The rule must specify attributes to be validated and the validator name.',
-							['{class}' => get_class($this)]
-						)
+					throw new \Exception(
+							'{'.get_class($this).'} has an invalid validation rule. The rule must specify attributes to be validated and the validator name.'
 					);
 				}
 			}
 		}
 
-		if(is_object($this->scenario) && ($this->scenario instanceof Closure)){
+		if(is_object($this->scenario) && ($this->scenario instanceof \Closure)){
 			$c->scenario = $this->scenario($object);
 		}else{
 			$c->scenario = $this->scenario;
@@ -126,7 +122,7 @@ class ESubdocumentValidator extends CValidator
 
 	/**
 	 * Sets the errors for a certain attribute
-	 * @param CModel $object the data object being validated
+	 * @param \Model $object the data object being validated
 	 * @param string $attribute the attribute being validated
 	 * @param array $messages the error messages for that attribute
 	 */

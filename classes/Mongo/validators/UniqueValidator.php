@@ -11,7 +11,7 @@ namespace Mongo\validators;
  * <li>{value}: replaced with current value of the attribute.</li>
  * </ul>
  */
-class EMongoUniqueValidator extends CValidator
+class UniqueValidator extends \Validator\Validator
 {
 	/**
 	 * @var boolean whether the comparison is case sensitive. Defaults to true.
@@ -65,7 +65,7 @@ class EMongoUniqueValidator extends CValidator
 	/**
 	 * Validates the attribute of the object.
 	 * If there is any error, the error message is added to the object.
-	 * @param CModel $object the object being validated
+	 * @param \Model $object the object being validated
 	 * @param string $attribute the attribute being validated
 	 */
 	protected function validateAttribute($object,$attribute)
@@ -79,19 +79,19 @@ class EMongoUniqueValidator extends CValidator
 		$attributeName = $this->attributeName === null ? $attribute : $this->attributeName;
 
 		// We get a RAW document here to prevent the need to make yet another active record instance
-		$doc = EMongoDocument::model($className)
+		$doc = \Mongo\Document::model($className)
 			->getCollection()
 			->findOne(
 				array_merge(
 					$this->criteria, 
-					[$attributeName => $this->caseSensitive ? $value : new MongoRegex('/' . $value . '/i')]
+					[$attributeName => $this->caseSensitive ? $value : new \MongoRegex('/' . $value . '/i')]
 				)
 			);
 
 		// If a doc was fund and it isn't this doc, as decided by the primnary key
 		if($doc && (string)$doc[$object->primaryKey()] != (string)$object->getPrimaryKey()){
 			// Then it ain't unique
-			$message = $this->message !== null ? $this->message : Yii::t('yii', '{attribute} "{value}" has already been taken.');
+			$message = $this->message !== null ? $this->message : '{attribute} "{'.$value.'}" has already been taken.';
 			$this->addError($object, $attribute, $message, ['{value}' => CHtml::encode($value)]);
 		}else{}
 	}
