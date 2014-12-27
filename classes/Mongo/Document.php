@@ -64,7 +64,7 @@ class Document extends \Mongo\Model
 
 		$this->init();
 
-		$this->attachBehaviors($this->behaviors());
+		//$this->attachBehaviors($this->behaviors());
 		$this->afterConstruct();
 	}
 
@@ -330,7 +330,7 @@ class Document extends \Mongo\Model
 		}
 		/** @var \Mongo\Document $model */
 		$model = self::$_models[$className] = new $className(null);
-		$model->attachBehaviors($model->behaviors());
+		//$model->attachBehaviors($model->behaviors());
 		return $model;
 	}
 
@@ -408,7 +408,7 @@ class Document extends \Mongo\Model
 			$record->setProjectedFields($labels);
 		}
 		//$record->_pk=$record->primaryKey();
-		$record->attachBehaviors($record->behaviors());
+		//$record->attachBehaviors($record->behaviors());
 		if($callAfterFind){
 			$record->afterFind();
 		}
@@ -911,23 +911,25 @@ class Document extends \Mongo\Model
 		$query = $this->mergeCriteria(isset($c['condition']) ? $c['condition'] : [], $criteria);
 		$project = $this->mergeCriteria(isset($c['project']) ? $c['project'] : [], $fields);
 
-		Yii::trace(
+
+
+		/*Yii::trace(
 			'Executing find: ' . '{$query:'.json_encode($query) . ',$project:'.json_encode($project)
 			 . (isset($c['sort']) ? ',$sort:'.json_encode($c['sort']).',' : '')
 			 . (isset($c['skip']) ? ',$skip:'.json_encode($c['skip']).',' : '')
 			 . (isset($c['limit']) ? ',$limit:'.json_encode($c['limit']).',' : '')
 			.'}', 
 			'extensions.MongoYii.\Mongo\Document'
-		);
+		);*/
 		
 		if($this->getDbConnection()->enableProfiling){
-			$token = 'extensions.MongoYii.\Mongo\Document.query.' . $this->collectionName() . '.find(' . '{$query:' . json_encode($query)
+			/*$token = 'extensions.MongoYii.\Mongo\Document.query.' . $this->collectionName() . '.find(' . '{$query:' . json_encode($query)
 			 . ',$project:'.json_encode($project)
 			 . (isset($c['sort']) ? ',$sort:'.json_encode($c['sort']).',' : '')
 			 . (isset($c['skip']) ? ',$skip:'.json_encode($c['skip']).',' : '')
 			 . (isset($c['limit']) ? ',$limit:'.json_encode($c['limit']).',' : '')
 			 .'})';
-			Yii::beginProfile($token, 'extensions.MongoYii.\Mongo\Document.find');
+			Yii::beginProfile($token, 'extensions.MongoYii.\Mongo\Document.find');*/
 		}
 
 		if($c !== []){
@@ -946,7 +948,7 @@ class Document extends \Mongo\Model
 			$cursor = new \Mongo\Cursor($this, $criteria, $project);
 		}
 		if($this->getDbConnection()->enableProfiling){
-			Yii::endProfile($token, 'extensions.MongoYii.\Mongo\Document.find');
+			//Yii::endProfile($token, 'extensions.MongoYii.\Mongo\Document.find');
 		}
 		return $cursor;
 	}
@@ -1442,7 +1444,7 @@ class Document extends \Mongo\Model
 	 */
 	public function mergeCriteria($oldCriteria, $newCriteria)
 	{
-		//return CMap::mergeArray($oldCriteria, $newCriteria);
+		return self::mergeArray($oldCriteria, $newCriteria);
 	}
 
 	/**
@@ -1451,6 +1453,20 @@ class Document extends \Mongo\Model
 	 */
 	public function trace($func)
 	{
-		//Yii::trace(get_class($this) . '.' . $func . '()', 'extensions.MongoYii.\Mongo\Document');
+		var_echo(get_class($this) . '.' . $func . '()', 'extensions.MongoYii.\Mongo\Document');
+	}
+
+	public static function mergeArray($a,$b)
+	{
+		foreach($b as $k=>$v)
+		{
+			if(is_integer($k))
+				$a[]=$v;
+			else if(is_array($v) && isset($a[$k]) && is_array($a[$k]))
+				$a[$k]=self::mergeArray($a[$k],$v);
+			else
+				$a[$k]=$v;
+		}
+		return $a;
 	}
 }

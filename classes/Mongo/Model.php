@@ -610,7 +610,7 @@ class Model extends \Model
 	 */
 	public function getMongoComponent()
 	{
-		return Yii::app()->mongodb;
+		return \MongoDBSystem::factory()->getMongoComponent();
 	}
 
 	/**
