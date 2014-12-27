@@ -52,13 +52,13 @@ That is the basic setup of the extension.
 You will notice that I use a `\Mongo\Client`. This is a bit deceptive since it actually represents `MongoClient` and `MongoDB` combined.  This means that whenever you call the magic `__call`
 on the `\Mongo\Client` like so:
 
-	Yii::app()->mongodb->getSomething();
+	\MongoDBSystem::app()->mongodb->getSomething();
 
 It will either try and call a function of `getSomething` in `\Mongo\Client` or, if the function does not exist, try and call it within the `MongoDB` class.
 
 If you wish to call a function on the `MongoClient` or `Mongo` class you will need to retrieve the connection object like so:
 
-	Yii::app()->mongodb->getConnection()->getSomething();
+	\MongoDBSystem::app()->mongodb->getConnection()->getSomething();
 
 `\Mongo\Client` is also designed to handle full write concern and read preferences in a compatible manner with all versions of the driver.
 
@@ -93,7 +93,7 @@ return your custom application component, for example:
 
 	public function getMongoComponent()
 	{
-		return Yii::app()->someweirddbconnectionINIT;
+		return \MongoDBSystem::app()->someweirddbconnectionINIT;
 	}
 
 and that model will now use that new application component to source its information. This is also helpful if you are using different databases for different models.
@@ -150,11 +150,11 @@ Please refer to the [drivers documentation for a full set of options here](http:
 
 To change the Read Preference at any time please use the function applicable to your driver; for 1.3.x series:
 
-	Yii::app()->mongodb->setReadPreference(MongoClient::RP_PRIMARY, array());
+	\MongoDBSystem::app()->mongodb->setReadPreference(MongoClient::RP_PRIMARY, array());
 
 and for pre-1.3:
 
-	Yii::app()->mongodb->setSlaveOkay(true);
+	\MongoDBSystem::app()->mongodb->setSlaveOkay(true);
 
 **Note:** Unlike write concern, the `RP` and `setSlaveOkay` variables do not inter-lock between different versions of the driver, using the `\Mongo\Client` `RP` variable
 will not translate to `slaveOkay`.
@@ -163,7 +163,7 @@ will not translate to `slaveOkay`.
 
 You can call the database directly at any time using the same implemented methods as you would using the driver normally. As an example, to query the database:
 
-	Yii::app()->mongodb->collection->find(array('name' => 'sammaye'));
+	\MongoDBSystem::app()->mongodb->collection->find(array('name' => 'sammaye'));
 
 So the active record element of MongoYii can quickly disappear if needed.
 
@@ -360,7 +360,7 @@ This is most useful when used in the `init()` function to produce pre-made index
 
     public function init()
     {
-        if(YII_DEBUG){
+        if(\MongoDBSystem::factory()->isDebug()){
             $this->ensureIndexes(array(
                 array('username' => 1),
                 array(array('email' => 1), array('unique' => true)),
@@ -886,7 +886,7 @@ otherwise Yii will not know how to handle the `MongoGridFSFile` object.
 
 Retreiving the file later is just as easy as saving it and is no different to finding any other record:
 
-	\Mongo\File::model()->findOne(array('userId'=>Yii::app()->user->id))
+	\Mongo\File::model()->findOne(array('userId'=>\MongoDBSystem::app()->user->id))
 
 This code snippet assumes we wish to find a file whose metadata field `userId` is of the current user in session.
 
@@ -1024,31 +1024,31 @@ The commented out lines are optional parameters you can send in if required.
 And now an example of its usage: 
 
 	// flush cache
-	Yii::app()->cache->flush();
+	\MongoDBSystem::app()->cache->flush();
 	
 	// add data to cache
-	Yii::app()->cache->set('apple', 'fruit');
-	Yii::app()->cache->set('onion', 'vegetables');
-	Yii::app()->cache->set(1, 'one');
-	Yii::app()->cache->set(2, 'two');
-	Yii::app()->cache->set('one', 1);
-	Yii::app()->cache->set('two', 2);
+	\MongoDBSystem::app()->cache->set('apple', 'fruit');
+	\MongoDBSystem::app()->cache->set('onion', 'vegetables');
+	\MongoDBSystem::app()->cache->set(1, 'one');
+	\MongoDBSystem::app()->cache->set(2, 'two');
+	\MongoDBSystem::app()->cache->set('one', 1);
+	\MongoDBSystem::app()->cache->set('two', 2);
 	
 	// delete from cache
-	Yii::app()->cache->delete(1);
-	Yii::app()->cache->delete('two');
+	\MongoDBSystem::app()->cache->delete(1);
+	\MongoDBSystem::app()->cache->delete('two');
 	
 	// read from cache
-	echo Yii::app()->cache->get(2);
+	echo \MongoDBSystem::app()->cache->get(2);
 	
 	// multiple read from cache
-	$arr = Yii::app()->cache->mget(array('apple', 1, 'two'));
+	$arr = \MongoDBSystem::app()->cache->mget(array('apple', 1, 'two'));
 
   	print_r($arr); // Array( [apple] => fruit [1] => [two] => )
   	
 ### \Mongo\MessageSource
 
-This is a MongoYii `Yii::t()` implementation by [Rajcsányi Zoltán](http://ezmegaz.hu/).
+This is a MongoYii `\MongoDBSystem::t()` implementation by [Rajcsányi Zoltán](http://ezmegaz.hu/).
 
 To use it first add it to your configuration:
 
@@ -1069,7 +1069,7 @@ And then add some messages to the translation table:
 
 And then simply get that message:
   
-	<?=Yii::t('users', 'Freund'); ?>
+	<?=\MongoDBSystem::t('users', 'Freund'); ?>
 	
 ### \Mongo\Session
 
@@ -1109,7 +1109,7 @@ This is to enable MongoYiis edition of [caching](http://www.yiiframework.com/doc
 
 Example usage of this class would be:
 
-	$cache = Yii::app()->cache;
+	$cache = \MongoDBSystem::app()->cache;
 	$cache->set(
 		'12', 
 		'dfgdfgf', 
@@ -1125,8 +1125,8 @@ would return `dfgdfgf` when the cache is not invalid but if you invalidate it it
 
 As such if I were then to run:
 
-	$cache = Yii::app()->cache;
-	Yii::app()->mongodb->t->insert(['g' => 1]);
+	$cache = \MongoDBSystem::app()->cache;
+	\MongoDBSystem::app()->mongodb->t->insert(['g' => 1]);
 	var_dump($cache->get('12'));
 
 I would get false as the return value.

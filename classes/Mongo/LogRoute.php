@@ -25,7 +25,7 @@ class LogRoute extends CLogRoute
 	 */
 	public function getMongoConnection()
 	{
-		//return Yii::app()->{$this->connectionId}->{$this->logCollectionName};
+		//return \MongoDBSystem::app()->{$this->connectionId}->{$this->logCollectionName};
 	}
 
 	/**

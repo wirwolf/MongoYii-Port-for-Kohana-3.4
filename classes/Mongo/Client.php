@@ -490,7 +490,7 @@ class Client/* extends CApplicationComponent*/
 	 */
 	public function getStats()
 	{
-		/*$logger = Yii::getLogger();
+		$logger = \MongoDBSystem::getLogger();
 		$timings = $logger->getProfilingResults(null, 'extensions.MongoYii.\Mongo\Document.findOne');
 		$count = count($timings);
 		$time = array_sum($timings);
@@ -513,6 +513,6 @@ class Client/* extends CApplicationComponent*/
 		$count += count($timings);
 		$time += array_sum($timings);
 		
-		return array($count, $time);*/
+		return array($count, $time);
 	}
 }

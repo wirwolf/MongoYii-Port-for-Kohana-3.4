@@ -307,7 +307,8 @@ class Model extends \Model
 		if($attributes === false){
 			return null;
 		}
-		
+
+		/** @var \Mongo\Model $record */
 		$record = new $this;
 		$record->setScenario('update');
 		
@@ -316,7 +317,7 @@ class Model extends \Model
 		}
 		
 		$record->init();
-		$record->attachBehaviors($record->behaviors());
+		//$record->attachBehaviors($record->behaviors());
 
 		if($runEvent){
 			$record->afterConstruct();
@@ -374,14 +375,10 @@ class Model extends \Model
 
 		if(!isset($relations[$name])){
 			throw new \Mongo\Exception(
-				Yii::t(
-					'yii',
-					'{class} does not have relation "{name}".',
-					['{class}' => get_class($this), '{name}' => $name]
-				)
+					'{'.get_class($this).'} does not have relation "{'.$name.'}".'
 			);
 		}
-		Yii::trace('lazy loading ' . get_class($this) . '.' . $name, 'extensions.MongoYii.\Mongo\Model');
+		\MongoDBSystem::trace('lazy loading ' . get_class($this) . '.' . $name, 'extensions.MongoYii.\Mongo\Model');
 
 		$cursor = [];
 		$relation = $relations[$name];
@@ -430,6 +427,7 @@ class Model extends \Model
 			$clause = array_merge($where, [$fkey => $pk]);
 		}
 
+		/** @var \Mongo\Document $o */
 		$o = $cname::model($cname);
 		if($relation[0] === 'one'){
 			// Lets find it and return it

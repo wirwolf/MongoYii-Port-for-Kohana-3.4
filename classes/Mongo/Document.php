@@ -621,20 +621,20 @@ class Document extends \Mongo\Model
 		if(!isset($this->{$this->primaryKey()})){
 			$document['_id'] = $this->{$this->primaryKey()} = $this->getPrimaryKey();
 		}
-		if(YII_DEBUG){
+		if(\MongoDBSystem::factory()->isDebug()){
 			// we're actually physically testing for Yii debug mode here to stop us from
 			// having to do the serialisation on the update doc normally.
-			Yii::trace('Executing insert: {$document:' . json_encode($document) . '}', 'extensions.MongoYii.\Mongo\Document');
+			\MongoDBSystem::trace('Executing insert: {$document:' . json_encode($document) . '}', 'extensions.MongoYii.\Mongo\Document');
 		}
 		if($this->getDbConnection()->enableProfiling){
-			Yii::beginProfile(
+			\MongoDBSystem::beginProfile(
 				'extensions.MongoYii.\Mongo\Document.query.' . $this->collectionName() . '.insert(' . '{$document:' . json_encode($document) . '})',
 				'extensions.MongoYii.\Mongo\Document.insert'
 			);
 		}
 		$this->lastError = $this->getCollection()->insert($document, $this->getDbConnection()->getDefaultWriteConcern());
 		if($this->getDbConnection()->enableProfiling){
-			Yii::endProfile(
+			\MongoDBSystem::endProfile(
 				'extensions.MongoYii.\Mongo\Document.query.' . $this->collectionName() . '.insert(' . '{$document:' . json_encode($document) . '})',
 				'extensions.MongoYii.\Mongo\Document.insert'
 			);
@@ -791,15 +791,16 @@ class Document extends \Mongo\Model
 
 		$this->beforeFind(); // Apparently this is applied before even scopes...
 
-		if($criteria instanceof \Mongo\Criteria){
+		if($criteria instanceof \Mongo\Criteria)
+		{
 			$criteria = $criteria->getCondition();
 		}
 		$c = $this->getDbCriteria();
 
 		$query = $this->mergeCriteria(isset($c['condition']) ? $c['condition'] : [], $criteria);
 		$project = $this->mergeCriteria(isset($c['project']) ? $c['project'] : [], $fields);
-		
-		Yii::trace(
+
+		\MongoDBSystem::trace(
 			'Executing findOne: '.'{$query:' . json_encode($query) . ',$project:' . json_encode($project) . '}',
 			'extensions.MongoYii.\Mongo\Document'
 		);
@@ -808,18 +809,18 @@ class Document extends \Mongo\Model
 			$this->getDbConnection()->queryCachingCount > 0 
 			&& $this->getDbConnection()->queryCachingDuration > 0
 			&& $this->getDbConnection()->queryCacheID !== false
-			&& ($cache = Yii::app()->getComponent($this->getDbConnection()->queryCacheID)) !== null
+			&& ($cache = \MongoDBSystem::app()->getComponent($this->getDbConnection()->queryCacheID)) !== null
 		){
 			$this->getDbConnection()->queryCachingCount--;
 			$cacheKey = 'yii:dbquery' . $this->getDbConnection()->server . ':' . $this->getDbConnection()->db;
 			$cacheKey .= ':' . $this->getDbConnection()->getSerialisedQuery($query, $project) . ':' . $this->getCollection();
 			if(($result = $cache->get($cacheKey)) !== false){
-				Yii::trace('Query result found in cache', 'extensions.MongoYii.\Mongo\Document');
+				\MongoDBSystem::trace('Query result found in cache', 'extensions.MongoYii.\Mongo\Document');
 				$record = $result[0];
 			}
 		}else{
 			if($this->getDbConnection()->enableProfiling){
-				Yii::beginProfile(
+				\MongoDBSystem::beginProfile(
 					'extensions.MongoYii.\Mongo\Document.query.' . $this->collectionName() . '.findOne(' . '{$query:' . json_encode($query) . ',$project:' . json_encode($project) . '}' . ')',
 					'extensions.MongoYii.\Mongo\Document.findOne'
 				);
@@ -828,7 +829,7 @@ class Document extends \Mongo\Model
 			$record = $this->getCollection()->findOne($query, $project);
 	
 			if($this->getDbConnection()->enableProfiling){
-				Yii::endProfile(
+				\MongoDBSystem::endProfile(
 					'extensions.MongoYii.\Mongo\Document.query.' . $this->collectionName() . '.findOne(' . '{$query:' . json_encode($query) . ',$project:' . json_encode($project) . '}' . ')',
 					'extensions.MongoYii.\Mongo\Document.findOne'
 				);
@@ -913,23 +914,23 @@ class Document extends \Mongo\Model
 
 
 
-		/*Yii::trace(
+		\MongoDBSystem::trace(
 			'Executing find: ' . '{$query:'.json_encode($query) . ',$project:'.json_encode($project)
 			 . (isset($c['sort']) ? ',$sort:'.json_encode($c['sort']).',' : '')
 			 . (isset($c['skip']) ? ',$skip:'.json_encode($c['skip']).',' : '')
 			 . (isset($c['limit']) ? ',$limit:'.json_encode($c['limit']).',' : '')
 			.'}', 
 			'extensions.MongoYii.\Mongo\Document'
-		);*/
+		);
 		
 		if($this->getDbConnection()->enableProfiling){
-			/*$token = 'extensions.MongoYii.\Mongo\Document.query.' . $this->collectionName() . '.find(' . '{$query:' . json_encode($query)
+			$token = 'extensions.MongoYii.\Mongo\Document.query.' . $this->collectionName() . '.find(' . '{$query:' . json_encode($query)
 			 . ',$project:'.json_encode($project)
 			 . (isset($c['sort']) ? ',$sort:'.json_encode($c['sort']).',' : '')
 			 . (isset($c['skip']) ? ',$skip:'.json_encode($c['skip']).',' : '')
 			 . (isset($c['limit']) ? ',$limit:'.json_encode($c['limit']).',' : '')
 			 .'})';
-			Yii::beginProfile($token, 'extensions.MongoYii.\Mongo\Document.find');*/
+			\MongoDBSystem::beginProfile($token, 'extensions.MongoYii.\Mongo\Document.find');
 		}
 
 		if($c !== []){
@@ -948,7 +949,7 @@ class Document extends \Mongo\Model
 			$cursor = new \Mongo\Cursor($this, $criteria, $project);
 		}
 		if($this->getDbConnection()->enableProfiling){
-			//Yii::endProfile($token, 'extensions.MongoYii.\Mongo\Document.find');
+			\MongoDBSystem::endProfile($token, 'extensions.MongoYii.\Mongo\Document.find');
 		}
 		return $cursor;
 	}
@@ -996,17 +997,17 @@ class Document extends \Mongo\Model
 
 		$query=array_merge([$this->primaryKey() => $pk], $criteria);
 
-		Yii::trace('Executing deleteByPk: ' . '{$query:' . json_encode($query) . '}', 'extensions.MongoYii.\Mongo\Document');
+		\MongoDBSystem::trace('Executing deleteByPk: ' . '{$query:' . json_encode($query) . '}', 'extensions.MongoYii.\Mongo\Document');
 
 		if($this->getDbConnection()->enableProfiling){
-			Yii::beginProfile(
+			\MongoDBSystem::beginProfile(
 				'extensions.MongoYii.\Mongo\Document.query.' . $this->collectionName() . '.deleteByPk({$query:' . json_encode($query) . '})',
 				'extensions.MongoYii.\Mongo\Document.deleteByPk'
 			);
 		}
 		$result = $this->getCollection()->remove($query, array_merge($this->getDbConnection()->getDefaultWriteConcern(), $options));
 		if($this->getDbConnection()->enableProfiling){
-			Yii::endProfile(
+			\MongoDBSystem::endProfile(
 				'extensions.MongoYii.\Mongo\Document.query.' . $this->collectionName() . '.deleteByPk({$query:' . json_encode($query) . '})',
 				'extensions.MongoYii.\Mongo\Document.deleteByPk'
 			);
@@ -1033,16 +1034,16 @@ class Document extends \Mongo\Model
 
 		$query=$this->mergeCriteria($criteria, [$this->primaryKey() => $pk]);
 
-		if(YII_DEBUG){
+		if(\MongoDBSystem::factory()->isDebug()){
 			// we're actually physically testing for Yii debug mode here to stop us from
 			// having to do the serialisation on the update doc normally.
-			Yii::trace(
+			\MongoDBSystem::trace(
 				'Executing updateByPk: {$query:' . json_encode($query) . ',$document:' . json_encode($updateDoc) . '}', 
 				'extensions.MongoYii.\Mongo\Document'
 			);
 		}
 		if($this->getDbConnection()->enableProfiling){
-			Yii::beginProfile(
+			\MongoDBSystem::beginProfile(
 				'extensions.MongoYii.\Mongo\Document.query.' . $this->collectionName() . '.updateByPk({$query:' . json_encode($query) . ',$document:' . json_encode($updateDoc) . '})',
 				'extensions.MongoYii.\Mongo\Document.updateByPk'
 			);
@@ -1055,7 +1056,7 @@ class Document extends \Mongo\Model
 		);
 
 		if($this->getDbConnection()->enableProfiling){
-			Yii::endProfile(
+			\MongoDBSystem::endProfile(
 				'extensions.MongoYii.\Mongo\Document.query.' . $this->collectionName() . '.updateByPk({$query:' . json_encode($query) . ',$document:' . json_encode($updateDoc) . '})',
 				'extensions.MongoYii.\Mongo\Document.updateByPk'
 			);
@@ -1079,10 +1080,10 @@ class Document extends \Mongo\Model
 		}
 		$options = array_merge($this->getDbConnection()->getDefaultWriteConcern(), $options);
 
-		if(YII_DEBUG){
+		if(\MongoDBSystem::factory()->isDebug()){
 			// we're actually physically testing for Yii debug mode here to stop us from
 			// having to do the serialisation on the update doc normally.
-			Yii::trace(
+			\MongoDBSystem::trace(
 				'Executing updateAll: {$query:' . json_encode($criteria)
 				 . ',$document:' . json_encode($updateDoc) . ',$options:' . json_encode($options) . '}', 
 				'extensions.MongoYii.\Mongo\Document'
@@ -1092,13 +1093,13 @@ class Document extends \Mongo\Model
 			$token = 'extensions.MongoYii.\Mongo\Document.query.' . $this->collectionName() . '.updateAll({$query:' . json_encode($criteria)
 			 . ',$document:'.json_encode($updateDoc)
 			 . ',$options:'.json_encode($options).'})';
-			Yii::beginProfile($token, 'extensions.MongoYii.\Mongo\Document.updateAll');
+			\MongoDBSystem::beginProfile($token, 'extensions.MongoYii.\Mongo\Document.updateAll');
 		}
 
 		$result = $this->getCollection()->update($criteria, $updateDoc, $options);
 
 		if($this->getDbConnection()->enableProfiling){
-			Yii::endProfile($token, 'extensions.MongoYii.\Mongo\Document.updateAll');
+			\MongoDBSystem::endProfile($token, 'extensions.MongoYii.\Mongo\Document.updateAll');
 		}
 		return $result;
 	}
@@ -1117,12 +1118,12 @@ class Document extends \Mongo\Model
 			$criteria = $criteria->getCondition();
 		}
 		
-		Yii::trace(
+		\MongoDBSystem::trace(
 			'Executing deleteAll: {$query:' . json_encode($criteria) . '}', 
 			'extensions.MongoYii.\Mongo\Document'
 		);
 		if($this->getDbConnection()->enableProfiling){
-			Yii::beginProfile(
+			\MongoDBSystem::beginProfile(
 				'extensions.MongoYii.\Mongo\Document.query.' . $this->collectionName() . '.deleteAll({$query:' . json_encode($criteria) . '})',
 				'extensions.MongoYii.\Mongo\Document.deleteAll'
 			);
@@ -1131,7 +1132,7 @@ class Document extends \Mongo\Model
 		$result = $this->getCollection()->remove($criteria, array_merge($this->getDbConnection()->getDefaultWriteConcern(), $options));
 
 		if($this->getDbConnection()->enableProfiling){
-			Yii::endProfile(
+			\MongoDBSystem::endProfile(
 				'extensions.MongoYii.\Mongo\Document.query.' . $this->collectionName() . '.deleteAll({$query:' . json_encode($criteria) . '})',
 				'extensions.MongoYii.\Mongo\Document.deleteAll'
 			);
@@ -1284,7 +1285,8 @@ class Document extends \Mongo\Model
 			//$query = CMap::mergeArray($query, $c['condition']);
 		}
 
-		return Yii::app()->mongodb->command([
+
+		return \MongoDBSystem::factory()->getMongoComponent()->command([
 			'distinct' => $this->collectionName(),
 			'key' => $key,
 			'query' => $query
@@ -1453,7 +1455,7 @@ class Document extends \Mongo\Model
 	 */
 	public function trace($func)
 	{
-		var_echo(get_class($this) . '.' . $func . '()', 'extensions.MongoYii.\Mongo\Document');
+		\MongoDBSystem::trace(get_class($this) . '.' . $func . '()', 'extensions.MongoYii.\Mongo\Document');
 	}
 
 	public static function mergeArray($a,$b)

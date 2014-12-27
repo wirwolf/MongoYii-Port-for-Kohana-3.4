@@ -148,7 +148,7 @@ class Cursor implements \Iterator, \Countable
 				$this->model->getDbConnection()->queryCachingCount > 0
 				&& $this->model->getDbConnection()->queryCachingDuration > 0
 				&& $this->model->getDbConnection()->queryCacheID !== false
-				&& ($cache = Yii::app()->getComponent($this->model->getDbConnection()->queryCacheID)) !== null
+				&& ($cache = \MongoDBSystem::app()->getComponent($this->model->getDbConnection()->queryCacheID)) !== null
 			){
 				$this->model->getDbConnection()->queryCachingCount--;
 				$info = $this->cursor()->info();
@@ -165,7 +165,7 @@ class Cursor implements \Iterator, \Countable
 				. ':' . $this->model->getCollection();
 
 				if(($result = $cache->get($cacheKey)) !== false){
-					Yii::trace('Query result found in cache', 'extensions.MongoYii.\Mongo\Document');
+					\MongoDBSystem::trace('Query result found in cache', 'extensions.MongoYii.\Mongo\Document');
 					$this->cachedArray = $result;
 					$this->fromCache = true;
 				}else{

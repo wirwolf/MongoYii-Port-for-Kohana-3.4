@@ -227,10 +227,10 @@ class File extends \Mongo\Document
 			$document=$this->filterRawDocument($this->getAttributes($attributes));
 		}
 
-		if(YII_DEBUG){
+		if(\MongoDBSystem::factory()->isDebug()){
 			// we're actually physically testing for Yii debug mode here to stop us from
 			// having to do the serialisation on the update doc normally.
-			Yii::trace('Executing storeFile: {$document:' . json_encode($document) . '}', 'extensions.MongoYii.\Mongo\Document');
+			\MongoDBSystem::trace('Executing storeFile: {$document:' . json_encode($document) . '}', 'extensions.MongoYii.\Mongo\Document');
 		}
 		if($this->getDbConnection()->enableProfiling){
 			$this->profile('extensions.MongoYii.\Mongo\File.insert({$document:' . json_encode($document) . '})', 'extensions.MongoYii.\Mongo\File.insert');
@@ -261,6 +261,12 @@ class File extends \Mongo\Document
 	 */
 	public function trace($func)
 	{
-		//Yii::trace(get_class($this) . '.' . $func.'()', 'extensions.MongoYii.\Mongo\File');
+		\MongoDBSystem::trace(get_class($this) . '.' . $func.'()', 'extensions.MongoYii.\Mongo\File');
 	}
+
+	private function profile($string, $string1)
+	{
+
+	}
+
 }
