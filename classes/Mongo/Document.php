@@ -556,9 +556,9 @@ class Document extends \Mongo\Model
 	 * @return bool
 	 */
 	public function save($runValidation = true, $attributes = null){
-		/*if(!$runValidation || $this->validate($attributes)){
+		if(!$runValidation || $this->validate($attributes)){
 			return $this->getIsNewRecord() ? $this->insert($attributes) : $this->update($attributes);
-		}*/
+		}
 		return false;
 	}
 
