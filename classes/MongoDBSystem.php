@@ -77,18 +77,27 @@ class MongoDBSystem {
 	/**********************Debug Functions***************************************************************************/
 	public static function trace($text,$key)
 	{
-		\DebugBar::instance()->MongoDB->addMessage($text,$key);
+		if(class_exists("\\DebugBar",true))
+		{
+			\DebugBar::instance()->MongoDB->addMessage($text,$key);
+		}
 	}
 
 
 	public static function beginProfile($data, $key)
 	{
-		\DebugBar::instance()->time->startMeasure($data, $key);
+		if(class_exists("\\DebugBar",true))
+		{
+			\DebugBar::instance()->time->startMeasure($data, $key);
+		}
 	}
 
 	public static function endProfile($data, $key)
 	{
-		\DebugBar::instance()->time->stopMeasure($data, $key);
+		if(class_exists("\\DebugBar",true))
+		{
+			\DebugBar::instance()->time->stopMeasure($data, $key);
+		}
 	}
 
 
